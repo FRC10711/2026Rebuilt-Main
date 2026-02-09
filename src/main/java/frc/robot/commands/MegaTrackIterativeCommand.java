@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoShootConstants;
+import frc.robot.Constants.MegaTrackIterativeCommandConstants;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.intake.Intake.WantedState;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -70,7 +72,8 @@ public class MegaTrackIterativeCommand extends Command {
     this.xSupplier = robot.getDriveXSupplier();
     this.ySupplier = robot.getDriveYSupplier();
     headingController.enableContinuousInput(-Math.PI, Math.PI);
-    addRequirements(robot.drive, robot.shooter, robot.hood, robot.feeder, robot.indexer);
+    addRequirements(
+        robot.drive, robot.shooter, robot.hood, robot.feeder, robot.indexer, robot.intake);
   }
 
   private Translation2d getShotOriginField() {
@@ -137,6 +140,7 @@ public class MegaTrackIterativeCommand extends Command {
   @Override
   public void initialize() {
     headingController.reset();
+    robot.intake.setWantedState(WantedState.FLICK_BACK);
     heldHeading = drive.getRotation();
     state = State.ALIGN;
   }
@@ -178,8 +182,8 @@ public class MegaTrackIterativeCommand extends Command {
     double omega =
         MathUtil.clamp(
             omegaPid + omegaFf,
-            -drive.getMaxAngularSpeedRadPerSec(),
-            drive.getMaxAngularSpeedRadPerSec());
+            -MegaTrackIterativeCommandConstants.MAX_OMEGA,
+            MegaTrackIterativeCommandConstants.MAX_OMEGA);
 
     ChassisSpeeds fieldRelative =
         new ChassisSpeeds(
@@ -295,5 +299,6 @@ public class MegaTrackIterativeCommand extends Command {
     robot.indexer.stop();
     robot.hood.stop();
     robot.shooter.stop();
+    robot.intake.setWantedState(WantedState.UP_STOW_STOP);
   }
 }

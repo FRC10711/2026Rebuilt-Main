@@ -33,7 +33,21 @@ public class IndexerIOTalonFX implements IndexerIO {
         Constants.IndexerConstants.INVERTED
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
+    cfg.CurrentLimits.SupplyCurrentLimitEnable =
+        Constants.IndexerConstants.ENABLE_SUPPLY_CURRENT_LIMIT;
+    cfg.CurrentLimits.SupplyCurrentLimit = Constants.IndexerConstants.SUPPLY_CURRENT_LIMIT_AMPS;
+    cfg.CurrentLimits.SupplyCurrentLowerLimit =
+        Constants.IndexerConstants.SUPPLY_CURRENT_LOWER_LIMIT_AMPS;
+    cfg.CurrentLimits.SupplyCurrentLowerTime =
+        Constants.IndexerConstants.SUPPLY_CURRENT_LOWER_TIME_SEC;
+    cfg.CurrentLimits.StatorCurrentLimitEnable =
+        Constants.IndexerConstants.ENABLE_STATOR_CURRENT_LIMIT;
+    cfg.CurrentLimits.StatorCurrentLimit = Constants.IndexerConstants.STATOR_CURRENT_LIMIT_AMPS;
     motor1.getConfigurator().apply(cfg);
+    cfg.MotorOutput.Inverted =
+        !Constants.IndexerConstants.INVERTED
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
     motor2.getConfigurator().apply(cfg);
 
     appliedVolts1 = motor1.getMotorVoltage();

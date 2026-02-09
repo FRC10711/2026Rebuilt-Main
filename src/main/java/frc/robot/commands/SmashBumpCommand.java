@@ -99,7 +99,7 @@ public class SmashBumpCommand extends Command {
 
       // Pre-bump pose (no 90° snap)
       alignTargetPose = FieldConstants.getNearestBumpPrePose(robot.drive.getPose());
-      sprintHeading = chosenLine.approachHeading();
+      sprintHeading = alignTargetPose.getRotation();
       alignTarget =
           new APTarget(alignTargetPose)
               .withEntryAngle(chosenLine.approachHeading())

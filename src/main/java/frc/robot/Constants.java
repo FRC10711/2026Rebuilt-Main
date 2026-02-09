@@ -36,7 +36,7 @@ public final class Constants {
 
   // ---------------- Autopilot (vendor lib) ----------------
   private static final APConstraints kAutopilotConstraints =
-      new APConstraints().withAcceleration(6.0).withJerk(5.0);
+      new APConstraints().withAcceleration(10.0);
 
   private static final APProfile kAutopilotProfile =
       new APProfile(kAutopilotConstraints)
@@ -81,13 +81,13 @@ public final class Constants {
     public static final double ALIGN_THETA_TOL_DEG = 5.0;
 
     // Autopilot target config during ALIGN
-    public static final double ALIGN_END_VELOCITY_MPS = 2.0;
+    public static final double ALIGN_END_VELOCITY_MPS = 2.;
 
     // Sprint behavior (field-relative along approach direction)
-    public static final double SPRINT_SPEED_MPS = 2.5;
+    public static final double SPRINT_SPEED_MPS = 2.;
 
     // Heading hold during sprint
-    public static final double HEADING_KP = 6.0;
+    public static final double HEADING_KP = 5.0;
     public static final double HEADING_KI = 0.0;
     public static final double HEADING_KD = 0.2;
 
@@ -124,8 +124,8 @@ public final class Constants {
     public static final double EXIT_HEADING_TOL_RAD = Math.toRadians(4.0);
 
     // Feed outputs
-    public static final double FEEDER_RPS = 30.0;
-    public static final double INDEXER_VOLTS = 10.0;
+    public static final double FEEDER_RPS = 20.0;
+    public static final double INDEXER_VOLTS = 8.0;
 
     private MegaTrackCommandConstants() {}
   }
@@ -140,7 +140,7 @@ public final class Constants {
     public static final double HEADING_KD = 0.1;
 
     // Fixed-point iteration tuning
-    public static final int MAX_ITERS = 6;
+    public static final int MAX_ITERS = 12;
     public static final double EPS_T_SEC = 1e-3;
     public static final double RELAX = 0.7; // 1.0 = plain fixed-point, <1 adds damping
     public static final double MIN_T_SEC = 0.0;
@@ -153,14 +153,15 @@ public final class Constants {
     // Hysteresis: tighter enter, looser stay
     public static final double ENTER_HEADING_TOL_RAD = Math.toRadians(2.0);
     public static final double EXIT_HEADING_TOL_RAD = Math.toRadians(4.0);
+    public static final double MAX_OMEGA = Math.PI / 2;
     public static final double ENTER_FLYWHEEL_RPS_TOL = 1.5;
-    public static final double EXIT_FLYWHEEL_RPS_TOL = 2.5;
+    public static final double EXIT_FLYWHEEL_RPS_TOL = 12;
     public static final double ENTER_HOOD_DEG_TOL = 1.0;
     public static final double EXIT_HOOD_DEG_TOL = 2.0;
 
     public static final double TRIGGER_AXIS_THRESHOLD = 0.25;
     public static final double FEEDER_RPS = 20.0;
-    public static final double INDEXER_VOLTS = 10.0;
+    public static final double INDEXER_VOLTS = 8.0;
 
     private MegaTrackIterativeCommandConstants() {}
   }
@@ -179,48 +180,50 @@ public final class Constants {
   /** Intake CAN IDs and tuning. Update these to match your robot wiring. */
   public static final class IntakeConstants {
     // CAN IDs
-    public static final int LEADER_MOTOR_ID = 50;
-    public static final int FOLLOWER_MOTOR_ID = 19;
+    public static final int LEADER_MOTOR_ID = 22;
     /** TODO: set to your deploy/arm motor CAN ID (收放电机). */
-    public static final int DEPLOY_MOTOR_ID = 0;
+    public static final int DEPLOY_MOTOR_ID = 23;
 
     // Motor directions
-    public static final boolean LEADER_INVERTED = false;
-    public static final boolean FOLLOWER_INVERTED = true;
+    public static final boolean LEADER_INVERTED = true;
     public static final boolean DEPLOY_INVERTED = false;
 
     // ---------------- Roller (吸球滚轮) ----------------
     /** Rollers voltage for intaking (volts). */
-    public static final double ROLLER_INTAKE_VOLTS = 10.0;
+    public static final double ROLLER_INTAKE_VOLTS = 18;
     /** Rollers voltage for stopping (volts). */
     public static final double ROLLER_STOP_VOLTS = 0.0;
 
     // ---------------- Deploy (收放摆臂) ----------------
     /** Sensor-to-mechanism ratio for deploy motor (motor rotations per mechanism rotation). */
-    public static final double DEPLOY_SENSOR_TO_MECH_RATIO = 1.0;
+    public static final double DEPLOY_SENSOR_TO_MECH_RATIO = 40. / 9. * 68. / 20. * 30. / 15;
 
     /** Deploy position when stowed (mechanism rotations). TODO tune. */
-    public static final double DEPLOY_POS_UP_ROT = 0.0;
+    public static final double DEPLOY_POS_UP_ROT =
+        edu.wpi.first.math.util.Units.degreesToRotations(10);
     /** Deploy position when deployed down (mechanism rotations). TODO tune. */
-    public static final double DEPLOY_POS_DOWN_ROT = 0.25;
+    public static final double DEPLOY_POS_DOWN_ROT =
+        edu.wpi.first.math.util.Units.degreesToRotations(-12);
+
+    public static final double FLIP_POS_UP = edu.wpi.first.math.util.Units.degreesToRotations(45);
 
     // Motion Magic (mechanism rotations/sec and rotations/sec^2)
-    public static final double DEPLOY_MM_CRUISE_VELOCITY = 1.0;
+    public static final double DEPLOY_MM_CRUISE_VELOCITY = 2.0;
     public static final double DEPLOY_MM_ACCELERATION = 2.0;
     public static final double DEPLOY_MM_JERK = 0.0;
 
     // Slot0 gains for MotionMagicTorqueCurrentFOC
-    public static final double DEPLOY_KP = 80.0;
+    public static final double DEPLOY_KP = 2000;
     public static final double DEPLOY_KI = 0.0;
-    public static final double DEPLOY_KD = 0.0;
+    public static final double DEPLOY_KD = 200;
     public static final double DEPLOY_KS = 0.0;
-    public static final double DEPLOY_KG = 0.0;
+    public static final double DEPLOY_KG = 12;
     public static final double DEPLOY_KV = 0.0;
     public static final double DEPLOY_KA = 0.0;
 
     // Flick/backfeed behavior (间歇性收放拨球) - simple oscillation
-    public static final double FLICK_ON_SEC = 0.20;
-    public static final double FLICK_OFF_SEC = 0.20;
+    public static final double FLICK_ON_SEC = 0.6;
+    public static final double FLICK_OFF_SEC = 0.6;
     /** In flick mode, rollers voltage (volts). TODO tune (can be 0 or slight reverse). */
     public static final double FLICK_ROLLER_VOLTS = 0.0;
 
@@ -599,7 +602,7 @@ public final class Constants {
 
       Translation2d u = best.dirUnit();
       Translation2d prePoint = bestClosest.minus(u.times(BUMP_PRE_DISTANCE_METERS));
-      return new Pose2d(prePoint, best.approachHeading());
+      return new Pose2d(prePoint, best.approachHeading().plus(Rotation2d.k180deg));
     }
 
     public static final Translation2d getHubLocation(Alliance alliance) {
@@ -658,23 +661,28 @@ public final class Constants {
       // hoodAngleMap.put(4.85, 40.0);
       // hoodAngleMap.put(5.787, 45.);
 
-      hoodAngleMap.put(1.072, 0.);
-      hoodAngleMap.put(1.5, 1.);
-      hoodAngleMap.put(2.02, 3.2);
-      hoodAngleMap.put(2.65, 7.);
-      hoodAngleMap.put(2.983, 10.);
-      hoodAngleMap.put(3.42, 12.);
-      hoodAngleMap.put(4.08, 18.);
-      hoodAngleMap.put(5.05, 18.);
+      hoodAngleMap.put(1.610, 0.);
+      hoodAngleMap.put(1.959, 2.);
+      hoodAngleMap.put(2.397, 6.);
+      hoodAngleMap.put(3.026, 11.);
+      hoodAngleMap.put(3.435, 16.);
+      hoodAngleMap.put(3.996, 19.);
+      // hoodAngleMap.put(2.983, 10.);
+      // hoodAngleMap.put(3.42, 12.);
+      // hoodAngleMap.put(4.08, 18.);
+      // hoodAngleMap.put(5.05, 18.);
 
-      shooterSpeedMap.put(1.072, 30.);
-      shooterSpeedMap.put(1.5, 30.);
-      shooterSpeedMap.put(2.02, 33.5);
-      shooterSpeedMap.put(2.65, 35.3);
-      shooterSpeedMap.put(2.983, 36.8);
-      shooterSpeedMap.put(3.42, 37.3);
-      shooterSpeedMap.put(4.08, 37.);
-      shooterSpeedMap.put(5.05, 45.8);
+      shooterSpeedMap.put(1.610, 23.8);
+      shooterSpeedMap.put(1.959, 24.2);
+      shooterSpeedMap.put(2.397, 25.);
+      shooterSpeedMap.put(3.026, 26.2);
+      shooterSpeedMap.put(3.435, 26.8);
+      shooterSpeedMap.put(3.996, 27.);
+      // shooterSpeedMap.put(2.65, 35.3);
+      // shooterSpeedMap.put(2.983, 36.8);
+      // shooterSpeedMap.put(3.42, 37.3);
+      // shooterSpeedMap.put(4.08, 37.);
+      // shooterSpeedMap.put(5.05, 45.8);
 
       // Default flight-time map (placeholder). Start with constant FlyTime and tune with real data.
       flightTimeMap.put(0.0, FlyTime);
@@ -699,35 +707,50 @@ public final class Constants {
   /** Shooter CAN IDs and tuning. Update these to match your robot wiring & tuning. */
   public static final class ShooterConstants {
     // CAN IDs
-    public static final int FLYWHEEL_1_LEADER_ID = 15;
-    public static final int FLYWHEEL_1_FOLLOWER_ID = 16;
-    /** TODO: set to your second shooter leader CAN ID. */
-    public static final int FLYWHEEL_2_LEADER_ID = 0;
-    /** TODO: set to your second shooter follower CAN ID. */
-    public static final int FLYWHEEL_2_FOLLOWER_ID = 0;
+    public static final int FLYWHEEL_1_LEADER_ID = 13;
+    public static final int FLYWHEEL_1_FOLLOWER_ID = 14;
+    public static final int FLYWHEEL_2_LEADER_ID = 15;
+    public static final int FLYWHEEL_2_FOLLOWER_ID = 16;
 
     // Motor directions
     public static final boolean FLYWHEEL_LEADER_INVERTED = false;
 
     public static final MotorAlignmentValue FLYWHEEL_1_FOLLOWER_INVERTED =
-        MotorAlignmentValue.Opposed;
+        MotorAlignmentValue.Aligned;
     public static final MotorAlignmentValue FLYWHEEL_2_FOLLOWER_INVERTED =
-        MotorAlignmentValue.Opposed;
+        MotorAlignmentValue.Aligned;
 
     // Gear ratios (motor rotations per mechanism rotation)
-    public static final double FLYWHEEL_SENSOR_TO_MECH_RATIO = 1.0;
+    public static final double FLYWHEEL_SENSOR_TO_MECH_RATIO = 30. / 24.;
 
     /** Flywheel/exit location relative to robot center (meters). +X forward, +Y left. */
-    public static final double FLYWHEEL_OFFSET_X_METERS = 0.18;
+    public static final double FLYWHEEL_OFFSET_X_METERS = -0.15;
 
     public static final double FLYWHEEL_OFFSET_Y_METERS = 0.0;
 
     // Flywheel closed-loop gains (Phoenix Slot0)
-    public static final double FLYWHEEL_KP = 6; // 6
-    public static final double FLYWHEEL_KI = 0.0;
-    public static final double FLYWHEEL_KD = 0.0;
-    public static final double FLYWHEEL_KV = 0.0;
-    public static final double FLYWHEEL_KS = 3.5; // 3.5
+    // Shooter 1
+    public static final double FLYWHEEL_1_KP = 15;
+    public static final double FLYWHEEL_1_KI = 0.0;
+    public static final double FLYWHEEL_1_KD = 0.0;
+    public static final double FLYWHEEL_1_KV = 0.34;
+    public static final double FLYWHEEL_1_KS = 12;
+
+    // Shooter 2 (default same as shooter 1; tune independently)
+    public static final double FLYWHEEL_2_KP = 15;
+    public static final double FLYWHEEL_2_KI = 0.0;
+    public static final double FLYWHEEL_2_KD = 0.0;
+    public static final double FLYWHEEL_2_KV = 0.34;
+    public static final double FLYWHEEL_2_KS = 12;
+
+    // Current limits (amps). Tune to protect wiring/breakers.
+    public static final boolean ENABLE_SUPPLY_CURRENT_LIMIT = true;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 40.0;
+    public static final double SUPPLY_CURRENT_LOWER_LIMIT_AMPS = 40.0;
+    public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
+
+    public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 140.0;
 
     private ShooterConstants() {}
   }
@@ -735,13 +758,13 @@ public final class Constants {
   /** Shared hood (angle adjustment) constants. Used by {@code Hood} subsystem. */
   public static final class HoodConstants {
     // CAN IDs
-    public static final int MOTOR_ID = 14;
+    public static final int MOTOR_ID = 21;
 
     // Motor direction
     public static final boolean INVERTED = true;
 
     // Gear ratio (motor rotations per mechanism rotation)
-    public static final double SENSOR_TO_MECH_RATIO = 31.875;
+    public static final double SENSOR_TO_MECH_RATIO = 160. / 9. * 34. / 20. * 26. / 12.;
 
     // Motion Magic (mechanism rotations/sec and rotations/sec^2)
     public static final double MM_CRUISE_VELOCITY = 0.5;
@@ -816,15 +839,14 @@ public final class Constants {
   /** Feeder CAN IDs and tuning. Update these to match your robot wiring & tuning. */
   public static final class FeederConstants {
     // CAN IDs
-    public static final int MOTOR_1_ID = 21;
-    public static final int FOLLOWER_1_ID = 34;
+    public static final int MOTOR_1_ID = 17;
+    public static final int FOLLOWER_1_ID = 18;
     /** TODO: set to your second feeder leader CAN ID. */
     public static final int MOTOR_2_ID = 0;
     /** TODO: set to your second feeder follower CAN ID. */
     public static final int FOLLOWER_2_ID = 0;
-
     // Motor direction
-    public static final boolean INVERTED = false;
+    public static final boolean INVERTED = true;
     /** Feeder follower alignment relative to leader. Use Opposed to run opposite direction. */
     public static final MotorAlignmentValue FOLLOWER_1_ALIGNMENT = MotorAlignmentValue.Opposed;
 
@@ -840,16 +862,34 @@ public final class Constants {
     public static final double KV = 0.;
     public static final double KS = 5;
 
+    // Current limits (amps)
+    public static final boolean ENABLE_SUPPLY_CURRENT_LIMIT = true;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 30.0;
+    public static final double SUPPLY_CURRENT_LOWER_LIMIT_AMPS = 25.0;
+    public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
+
+    public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 60.0;
+
     private FeederConstants() {}
   }
 
   /** Indexer CAN IDs and tuning. Update these to match your robot wiring & tuning. */
   public static final class IndexerConstants {
-    public static final int MOTOR_1_ID = 35;
+    public static final int MOTOR_1_ID = 19;
     /** TODO: set to your second indexer CAN ID. */
-    public static final int MOTOR_2_ID = 0;
+    public static final int MOTOR_2_ID = 20;
 
     public static final boolean INVERTED = false;
+
+    // Current limits (amps)
+    public static final boolean ENABLE_SUPPLY_CURRENT_LIMIT = true;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 25.0;
+    public static final double SUPPLY_CURRENT_LOWER_LIMIT_AMPS = 20.0;
+    public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
+
+    public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 50.0;
 
     private IndexerConstants() {}
   }

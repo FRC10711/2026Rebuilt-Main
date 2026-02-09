@@ -59,30 +59,58 @@ public class ShooterIOTalonFX implements ShooterIO {
             : InvertedValue.CounterClockwise_Positive;
     flywheelCfg.TorqueCurrent.PeakReverseTorqueCurrent = 0;
     flywheelCfg.Feedback.SensorToMechanismRatio = ShooterConstants.FLYWHEEL_SENSOR_TO_MECH_RATIO;
-    flywheelCfg.Slot0 =
-        new Slot0Configs()
-            .withKP(ShooterConstants.FLYWHEEL_KP)
-            .withKI(ShooterConstants.FLYWHEEL_KI)
-            .withKD(ShooterConstants.FLYWHEEL_KD)
-            .withKV(ShooterConstants.FLYWHEEL_KV)
-            .withKS(ShooterConstants.FLYWHEEL_KS);
+    flywheelCfg.CurrentLimits.SupplyCurrentLimitEnable =
+        ShooterConstants.ENABLE_SUPPLY_CURRENT_LIMIT;
+    flywheelCfg.CurrentLimits.SupplyCurrentLimit = ShooterConstants.SUPPLY_CURRENT_LIMIT_AMPS;
+    flywheelCfg.CurrentLimits.SupplyCurrentLowerLimit =
+        ShooterConstants.SUPPLY_CURRENT_LOWER_LIMIT_AMPS;
+    flywheelCfg.CurrentLimits.SupplyCurrentLowerTime =
+        ShooterConstants.SUPPLY_CURRENT_LOWER_TIME_SEC;
+    flywheelCfg.CurrentLimits.StatorCurrentLimitEnable =
+        ShooterConstants.ENABLE_STATOR_CURRENT_LIMIT;
+    flywheelCfg.CurrentLimits.StatorCurrentLimit = ShooterConstants.STATOR_CURRENT_LIMIT_AMPS;
 
     // Configure shooter 1
+    flywheelCfg.Slot0 =
+        new Slot0Configs()
+            .withKP(ShooterConstants.FLYWHEEL_1_KP)
+            .withKI(ShooterConstants.FLYWHEEL_1_KI)
+            .withKD(ShooterConstants.FLYWHEEL_1_KD)
+            .withKV(ShooterConstants.FLYWHEEL_1_KV)
+            .withKS(ShooterConstants.FLYWHEEL_1_KS);
     flywheel1Leader.getConfigurator().apply(flywheelCfg);
-    var followerCfg = new TalonFXConfiguration();
-    followerCfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    followerCfg.Feedback.SensorToMechanismRatio = ShooterConstants.FLYWHEEL_SENSOR_TO_MECH_RATIO;
-    followerCfg.Slot0 = flywheelCfg.Slot0;
-    flywheel1Follower.getConfigurator().apply(followerCfg);
+    var followerCfg1 = new TalonFXConfiguration();
+    followerCfg1.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    followerCfg1.Feedback.SensorToMechanismRatio = ShooterConstants.FLYWHEEL_SENSOR_TO_MECH_RATIO;
+    followerCfg1.Slot0 = flywheelCfg.Slot0;
+    followerCfg1.CurrentLimits = flywheelCfg.CurrentLimits;
+    flywheel1Follower.getConfigurator().apply(followerCfg1);
     flywheel1FollowerReq =
         new Follower(flywheel1Leader.getDeviceID(), ShooterConstants.FLYWHEEL_1_FOLLOWER_INVERTED);
     flywheel1Follower.setControl(flywheel1FollowerReq);
 
-    // Configure shooter 2 (same config)
+    // Configure shooter 2 (same base config, independent Slot0 gains)
+    flywheelCfg.MotorOutput.Inverted =
+        !ShooterConstants.FLYWHEEL_LEADER_INVERTED
+            ? InvertedValue.Clockwise_Positive
+            : InvertedValue.CounterClockwise_Positive;
+    flywheelCfg.Slot0 =
+        new Slot0Configs()
+            .withKP(ShooterConstants.FLYWHEEL_2_KP)
+            .withKI(ShooterConstants.FLYWHEEL_2_KI)
+            .withKD(ShooterConstants.FLYWHEEL_2_KD)
+            .withKV(ShooterConstants.FLYWHEEL_2_KV)
+            .withKS(ShooterConstants.FLYWHEEL_2_KS);
     flywheel2Leader.getConfigurator().apply(flywheelCfg);
-    flywheel2Follower.getConfigurator().apply(followerCfg);
+    var followerCfg2 = new TalonFXConfiguration();
+    followerCfg2.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    followerCfg2.Feedback.SensorToMechanismRatio = ShooterConstants.FLYWHEEL_SENSOR_TO_MECH_RATIO;
+    followerCfg2.Slot0 = flywheelCfg.Slot0;
+    followerCfg2.CurrentLimits = flywheelCfg.CurrentLimits;
+    flywheel2Follower.getConfigurator().apply(followerCfg2);
     flywheel2FollowerReq =
         new Follower(flywheel2Leader.getDeviceID(), ShooterConstants.FLYWHEEL_2_FOLLOWER_INVERTED);
+
     flywheel2Follower.setControl(flywheel2FollowerReq);
 
     // Acquire status signals
@@ -173,8 +201,6 @@ public class ShooterIOTalonFX implements ShooterIO {
   @Override
   public void stop() {
     flywheel1Leader.stopMotor();
-    flywheel1Follower.stopMotor();
     flywheel2Leader.stopMotor();
-    flywheel2Follower.stopMotor();
   }
 }

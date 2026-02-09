@@ -47,7 +47,6 @@ import frc.robot.subsystems.hood.HoodIO;
 import frc.robot.subsystems.hood.HoodIOTalonFX;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.hopper.HopperIO;
-import frc.robot.subsystems.hopper.HopperIOCANrange;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIO;
 import frc.robot.subsystems.indexer.IndexerIOTalonFX;
@@ -56,7 +55,6 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.led.LEDIO;
-import frc.robot.subsystems.led.LEDIOCANdle;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
@@ -79,12 +77,12 @@ public class RobotContainer {
   private LoggedTunableNumber hoodAngleDegTunable = new LoggedTunableNumber("Hood/AngleDeg", 0);
   private LoggedTunableNumber shooterVelRpsTunable = new LoggedTunableNumber("Shooter/VelRps", 0);
   private LoggedTunableNumber testShooterVel =
-      new LoggedTunableNumber("TestShoot/ShooterVelRPS", 30.0);
+      new LoggedTunableNumber("TestShoot/ShooterVelRPS", 26.0);
   private LoggedTunableNumber testHoodAngle =
       new LoggedTunableNumber("TestShoot/HoodAngleDeg", 6.0);
   private LoggedTunableNumber testFeederVel = new LoggedTunableNumber("TestShoot/FeederVelRPS", 20);
   private LoggedTunableNumber testIndexerVolts =
-      new LoggedTunableNumber("TestShoot/IndexerVolts", 10.0);
+      new LoggedTunableNumber("TestShoot/IndexerVolts", 3.0);
 
   @SuppressWarnings("unused")
   public final Shooter shooter;
@@ -144,9 +142,10 @@ public class RobotContainer {
         hood = new Hood(new HoodIOTalonFX());
         feeder = new Feeder(new FeederIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX());
+
         indexer = new Indexer(new IndexerIOTalonFX());
-        hopper = new Hopper(new HopperIOCANrange());
-        led = new LED(new LEDIOCANdle());
+        hopper = new Hopper(new HopperIO() {});
+        led = new LED(new LEDIO() {});
         break;
 
       case SIM:

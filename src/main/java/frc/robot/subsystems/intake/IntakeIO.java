@@ -10,11 +10,8 @@ public interface IntakeIO {
 
     // Roller motors (mechanism units after SensorToMechanismRatio config)
     public double leaderVelocityRadPerSec = 0.0;
-    public double followerVelocityRadPerSec = 0.0;
     public double leaderAppliedVolts = 0.0;
-    public double followerAppliedVolts = 0.0;
     public double leaderCurrentAmps = 0.0;
-    public double followerCurrentAmps = 0.0;
 
     // Deploy/arm motor (mechanism rotations after SensorToMechanismRatio config)
     public double deployPositionRot = 0.0;

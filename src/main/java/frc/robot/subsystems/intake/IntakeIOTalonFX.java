@@ -21,24 +21,19 @@ import frc.robot.Constants;
 public class IntakeIOTalonFX implements IntakeIO {
   // Roller motors
   private final TalonFX leader;
-  private final TalonFX follower;
 
   // Deploy motor (收放)
   private final TalonFX deploy;
 
   // Voltage control requests
   private final VoltageOut leaderVoltageReq = new VoltageOut(0.0);
-  private final VoltageOut followerVoltageReq = new VoltageOut(0.0);
   private final MotionMagicTorqueCurrentFOC deployMotionMagicReq =
       new MotionMagicTorqueCurrentFOC(0.0);
 
   // Status signals
   private final StatusSignal<AngularVelocity> leaderVelocity;
-  private final StatusSignal<AngularVelocity> followerVelocity;
   private final StatusSignal<Voltage> leaderAppliedVolts;
-  private final StatusSignal<Voltage> followerAppliedVolts;
   private final StatusSignal<Current> leaderCurrent;
-  private final StatusSignal<Current> followerCurrent;
 
   private final StatusSignal<Angle> deployPosition;
   private final StatusSignal<AngularVelocity> deployVelocity;
@@ -47,7 +42,6 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   public IntakeIOTalonFX() {
     leader = new TalonFX(Constants.IntakeConstants.LEADER_MOTOR_ID);
-    follower = new TalonFX(Constants.IntakeConstants.FOLLOWER_MOTOR_ID);
     deploy = new TalonFX(Constants.IntakeConstants.DEPLOY_MOTOR_ID);
 
     // ---------------- Roller config ----------------
@@ -58,14 +52,6 @@ public class IntakeIOTalonFX implements IntakeIO {
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
     leader.getConfigurator().apply(rollerLeaderCfg);
-
-    var rollerFollowerCfg = new TalonFXConfiguration();
-    rollerFollowerCfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    rollerFollowerCfg.MotorOutput.Inverted =
-        Constants.IntakeConstants.FOLLOWER_INVERTED
-            ? InvertedValue.Clockwise_Positive
-            : InvertedValue.CounterClockwise_Positive;
-    follower.getConfigurator().apply(rollerFollowerCfg);
 
     // ---------------- Deploy config (Motion Magic + TorqueCurrentFOC) ----------------
     var deployCfg = new TalonFXConfiguration();
@@ -92,15 +78,12 @@ public class IntakeIOTalonFX implements IntakeIO {
             .withMotionMagicJerk(Constants.IntakeConstants.DEPLOY_MM_JERK);
     deploy.getConfigurator().apply(deployCfg);
     // TODO: if you have an absolute reference / homing routine, do NOT blindly zero here.
-    // deploy.setPosition(0.0);
+    deploy.setPosition(1. / 4.);
 
     // Acquire status signals
     leaderVelocity = leader.getVelocity();
-    followerVelocity = follower.getVelocity();
     leaderAppliedVolts = leader.getMotorVoltage();
-    followerAppliedVolts = follower.getMotorVoltage();
     leaderCurrent = leader.getStatorCurrent();
-    followerCurrent = follower.getStatorCurrent();
 
     deployPosition = deploy.getPosition();
     deployVelocity = deploy.getVelocity();
@@ -110,15 +93,13 @@ public class IntakeIOTalonFX implements IntakeIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
         leaderVelocity,
-        followerVelocity,
         leaderAppliedVolts,
-        followerAppliedVolts,
         leaderCurrent,
-        followerCurrent,
         deployPosition,
         deployVelocity,
         deployAppliedVolts,
         deployCurrent);
+    // deploy.setPosition(1. / 4.);
   }
 
   @Override
@@ -126,23 +107,16 @@ public class IntakeIOTalonFX implements IntakeIO {
     var status =
         BaseStatusSignal.refreshAll(
             leaderVelocity,
-            followerVelocity,
             leaderAppliedVolts,
-            followerAppliedVolts,
             leaderCurrent,
-            followerCurrent,
             deployPosition,
             deployVelocity,
             deployAppliedVolts,
             deployCurrent);
 
     inputs.leaderVelocityRadPerSec = Units.rotationsToRadians(leaderVelocity.getValueAsDouble());
-    inputs.followerVelocityRadPerSec =
-        Units.rotationsToRadians(followerVelocity.getValueAsDouble());
     inputs.leaderAppliedVolts = leaderAppliedVolts.getValueAsDouble();
-    inputs.followerAppliedVolts = followerAppliedVolts.getValueAsDouble();
     inputs.leaderCurrentAmps = leaderCurrent.getValueAsDouble();
-    inputs.followerCurrentAmps = followerCurrent.getValueAsDouble();
 
     inputs.deployPositionRot = deployPosition.getValueAsDouble();
     inputs.deployVelocityRotPerSec = deployVelocity.getValueAsDouble();
@@ -155,7 +129,6 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void setRollerVoltage(double volts) {
     leader.setControl(leaderVoltageReq.withOutput(volts));
-    follower.setControl(followerVoltageReq.withOutput(volts));
   }
 
   @Override
@@ -167,7 +140,6 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void stop() {
     leader.stopMotor();
-    follower.stopMotor();
     deploy.stopMotor();
   }
 }

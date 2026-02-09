@@ -59,8 +59,12 @@ public class FeederIOTalonFX implements FeederIO {
             .withKV(FeederConstants.KV)
             .withKS(FeederConstants.KS);
     cfg.TorqueCurrent.PeakReverseTorqueCurrent = 0.0;
-    cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
-    cfg.CurrentLimits.StatorCurrentLimitEnable = true;
+    cfg.CurrentLimits.SupplyCurrentLimitEnable = FeederConstants.ENABLE_SUPPLY_CURRENT_LIMIT;
+    cfg.CurrentLimits.SupplyCurrentLimit = FeederConstants.SUPPLY_CURRENT_LIMIT_AMPS;
+    cfg.CurrentLimits.SupplyCurrentLowerLimit = FeederConstants.SUPPLY_CURRENT_LOWER_LIMIT_AMPS;
+    cfg.CurrentLimits.SupplyCurrentLowerTime = FeederConstants.SUPPLY_CURRENT_LOWER_TIME_SEC;
+    cfg.CurrentLimits.StatorCurrentLimitEnable = FeederConstants.ENABLE_STATOR_CURRENT_LIMIT;
+    cfg.CurrentLimits.StatorCurrentLimit = FeederConstants.STATOR_CURRENT_LIMIT_AMPS;
     motor1.getConfigurator().apply(cfg);
     motor2.getConfigurator().apply(cfg);
 
@@ -68,8 +72,7 @@ public class FeederIOTalonFX implements FeederIO {
     followerCfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     followerCfg.Feedback.SensorToMechanismRatio = FeederConstants.SENSOR_TO_MECH_RATIO;
     followerCfg.Slot0 = cfg.Slot0;
-    followerCfg.CurrentLimits.SupplyCurrentLimitEnable = false;
-    followerCfg.CurrentLimits.StatorCurrentLimitEnable = false;
+    followerCfg.CurrentLimits = cfg.CurrentLimits;
     followerMotor1.getConfigurator().apply(followerCfg);
     followerMotor2.getConfigurator().apply(followerCfg);
 
@@ -109,7 +112,9 @@ public class FeederIOTalonFX implements FeederIO {
   @Override
   public void setVelocity(double rps) {
     motor1.setControl(velocityReq1.withVelocity(rps));
+    followerMotor1.setControl(followerReq1);
     motor2.setControl(velocityReq2.withVelocity(rps));
+    followerMotor2.setControl(followerReq2);
   }
 
   @Override

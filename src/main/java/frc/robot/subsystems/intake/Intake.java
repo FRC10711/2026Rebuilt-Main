@@ -86,7 +86,7 @@ public class Intake extends SubsystemBase {
         }
         deployPosRotSetpoint =
             flickDownPhase
-                ? Constants.IntakeConstants.DEPLOY_POS_DOWN_ROT
+                ? Constants.IntakeConstants.FLIP_POS_UP
                 : Constants.IntakeConstants.DEPLOY_POS_UP_ROT;
         rollerVoltsSetpoint = Constants.IntakeConstants.FLICK_ROLLER_VOLTS;
       }
