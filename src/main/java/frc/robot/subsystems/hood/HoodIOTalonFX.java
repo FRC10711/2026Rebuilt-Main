@@ -88,6 +88,6 @@ public class HoodIOTalonFX implements HoodIO {
 
   @Override
   public void stop() {
-    hoodMotor.stopMotor();
+    hoodMotor.setControl(hoodMotionMagicReq.withPosition(0));
   }
 }

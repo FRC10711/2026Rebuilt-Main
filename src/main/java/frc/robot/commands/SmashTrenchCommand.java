@@ -30,7 +30,8 @@ import org.littletonrobotics.junction.Logger;
 public class SmashTrenchCommand extends Command {
   public enum State {
     ALIGN,
-    RUN
+    RUN,
+    END
   }
 
   private final RobotContainer robot;
@@ -79,7 +80,7 @@ public class SmashTrenchCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return state == State.END;
   }
 
   @Override
@@ -97,16 +98,13 @@ public class SmashTrenchCommand extends Command {
 
       // Pose selection (including heading snap) is handled in FieldConstants.
       alignTargetPose = FieldConstants.getNearestTrenchPrePose(robot.drive.getPose());
-      alignTarget =
-          new APTarget(alignTargetPose)
-              .withEntryAngle(chosenLine.approachHeading())
-              .withVelocity(Constants.TrenchCommandConstants.ALIGN_END_VELOCITY_MPS);
+      alignTarget = new APTarget(alignTargetPose).withEntryAngle(chosenLine.approachHeading());
 
       headingController.reset(robot.drive.getRotation().getRadians());
       Logger.recordOutput("Trench/AlignTargetPose", alignTargetPose);
       Logger.recordOutput("Trench/ChosenClosestPoint", chosenClosestPoint);
       Logger.recordOutput("Trench/ChosenApproachHeading", chosenLine.approachHeading());
-    } else if (state == State.RUN) {
+      // Push distance is measured from the ALIGN target pose.
       runStartPose = alignTargetPose;
 
       Translation2d u = chosenLine.dirUnit();
@@ -114,12 +112,15 @@ public class SmashTrenchCommand extends Command {
           runStartPose
               .getTranslation()
               .plus(u.times(Constants.TrenchCommandConstants.RUN_PUSH_DISTANCE_METERS));
+      // Hold the same snapped heading as the align target.
       runTargetPose = new Pose2d(targetPoint, alignTargetPose.getRotation());
-      runTarget = new APTarget(runTargetPose).withEntryAngle(chosenLine.approachHeading());
+      runTarget = new APTarget(runTargetPose);
 
       headingController.reset(robot.drive.getRotation().getRadians());
+
       Logger.recordOutput("Trench/RunStartPose", runStartPose);
       Logger.recordOutput("Trench/RunTargetPose", runTargetPose);
+    } else if (state == State.RUN) {
     }
   }
 
@@ -163,7 +164,7 @@ public class SmashTrenchCommand extends Command {
 
     double vx = out.vx().in(Units.MetersPerSecond);
     double vy = out.vy().in(Units.MetersPerSecond);
-    Rotation2d headingRef = alignTargetPose.getRotation();
+    Rotation2d headingRef = out.targetAngle();
 
     double omega =
         headingController.calculate(
@@ -179,19 +180,27 @@ public class SmashTrenchCommand extends Command {
     Logger.recordOutput("Trench/AlignOmegaCmdRps", omega);
 
     Pose2d pose = robot.drive.getPose();
-    boolean yOk =
-        Math.abs(pose.getY() - alignTargetPose.getY())
-            <= Constants.TrenchCommandConstants.ALIGN_Y_TOL_METERS;
+    // Measure errors in the approach-line coordinate frame (robust even without snap-to-90).
+    Translation2d u = chosenLine.dirUnit(); // approach direction unit
+    Translation2d a = chosenLine.axisUnit(); // trench axis unit (perpendicular to approach)
+    Translation2d delta = pose.getTranslation().minus(alignTargetPose.getTranslation());
+    double alongErr = delta.getX() * u.getX() + delta.getY() * u.getY();
+    double lateralErr = delta.getX() * a.getX() + delta.getY() * a.getY();
+    boolean alongOk = Math.abs(alongErr) <= Constants.TrenchCommandConstants.ALIGN_ALONG_TOL_METERS;
+    boolean lateralOk =
+        Math.abs(lateralErr) <= Constants.TrenchCommandConstants.ALIGN_LATERAL_TOL_METERS;
     double thetaErr =
         MathUtil.angleModulus(
             pose.getRotation().getRadians() - alignTargetPose.getRotation().getRadians());
     boolean headingOk =
         Math.abs(thetaErr) <= Math.toRadians(Constants.TrenchCommandConstants.ALIGN_THETA_TOL_DEG);
-    Logger.recordOutput("Trench/AlignYOk", yOk);
+    Logger.recordOutput("Trench/AlignAlongErrM", alongErr);
+    Logger.recordOutput("Trench/AlignLateralErrM", lateralErr);
+    Logger.recordOutput("Trench/AlignAlongOk", alongOk);
+    Logger.recordOutput("Trench/AlignLateralOk", lateralOk);
     Logger.recordOutput("Trench/AlignHeadingOk", headingOk);
 
-    if (yOk && headingOk) {
-      robot.drive.stop();
+    if (alongOk && lateralOk && headingOk) {
       setState(State.RUN);
     }
   }
@@ -203,7 +212,7 @@ public class SmashTrenchCommand extends Command {
 
     double vx = out.vx().in(Units.MetersPerSecond);
     double vy = out.vy().in(Units.MetersPerSecond);
-    Rotation2d headingRef = runTargetPose.getRotation();
+    Rotation2d headingRef = out.targetAngle();
 
     double omega =
         headingController.calculate(
@@ -217,6 +226,7 @@ public class SmashTrenchCommand extends Command {
     Logger.recordOutput("Trench/RunVxCmdMps", vx);
     Logger.recordOutput("Trench/RunVyCmdMps", vy);
     Logger.recordOutput("Trench/RunOmegaCmdRps", omega);
+    // Logger.recordOutput("Trench/TargetPose",Constants.kAutopilot.)
 
     Translation2d u = chosenLine.dirUnit();
     Translation2d delta =
@@ -227,7 +237,7 @@ public class SmashTrenchCommand extends Command {
     if (pushedMeters
         >= (Constants.TrenchCommandConstants.RUN_PUSH_DISTANCE_METERS
             - Constants.TrenchCommandConstants.RUN_PUSH_DONE_TOL_METERS)) {
-      robot.drive.stop();
+      state = State.END;
     }
   }
 }

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -14,6 +15,8 @@ public class Intake extends SubsystemBase {
     DOWN_INTAKE,
     /** 向上收回 + 停止吸球 */
     UP_STOW_STOP,
+    /** 射球时：根据射球数量“越收越回” */
+    SHOT_LINKED_STOW,
     /** 间歇性收放，用来把球往后拨 */
     FLICK_BACK
   }
@@ -22,6 +25,9 @@ public class Intake extends SubsystemBase {
 
   private double rollerVoltsSetpoint = 0.0;
   private double deployPosRotSetpoint = 0.0;
+
+  // Shot-linked stow
+  private int shotCount = 0;
 
   // Flick timing
   private boolean flickDownPhase = false;
@@ -54,6 +60,11 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  /** Provide total shots fired to drive {@link WantedState#SHOT_LINKED_STOW}. */
+  public void setShotCount(int shotCount) {
+    this.shotCount = Math.max(0, shotCount);
+  }
+
   /** Backwards-compatible helper: directly set roller voltage and keep current deploy state. */
   public void setVoltage(double volts) {
     rollerVoltsSetpoint = volts;
@@ -71,8 +82,22 @@ public class Intake extends SubsystemBase {
         rollerVoltsSetpoint = Constants.IntakeConstants.ROLLER_INTAKE_VOLTS;
       }
       case UP_STOW_STOP -> {
-        deployPosRotSetpoint = Constants.IntakeConstants.DEPLOY_POS_UP_ROT;
+        double baseUp = Constants.IntakeConstants.DEPLOY_POS_UP_ROT;
+        deployPosRotSetpoint = baseUp;
         rollerVoltsSetpoint = Constants.IntakeConstants.ROLLER_STOP_VOLTS;
+      }
+      case SHOT_LINKED_STOW -> {
+        double baseUp = Constants.IntakeConstants.DEPLOY_POS_UP_ROT;
+        double extra =
+            MathUtil.clamp(
+                shotCount * Constants.IntakeConstants.SHOOT_STOW_EXTRA_PER_SHOT_ROT,
+                Constants.IntakeConstants.SHOOT_STOW_EXTRA_MIN_ROT,
+                Constants.IntakeConstants.SHOOT_STOW_EXTRA_MAX_ROT);
+        deployPosRotSetpoint = baseUp + extra;
+        rollerVoltsSetpoint = Constants.IntakeConstants.ROLLER_STOP_VOLTS;
+
+        Logger.recordOutput("Intake/ShotLinkedStow/Shots", shotCount);
+        Logger.recordOutput("Intake/ShotLinkedStow/ExtraRot", extra);
       }
       case FLICK_BACK -> {
         double now = Timer.getFPGATimestamp();

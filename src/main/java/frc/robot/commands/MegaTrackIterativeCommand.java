@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoShootConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.MegaTrackIterativeCommandConstants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.intake.Intake.WantedState;
@@ -37,7 +38,8 @@ public class MegaTrackIterativeCommand extends Command {
 
   private final RobotContainer robot;
   private final frc.robot.subsystems.drive.Drive drive;
-  private final Translation2d targetTranslation;
+  private final boolean isLob;
+  private Translation2d targetTranslation = new Translation2d();
   private final java.util.function.DoubleSupplier xSupplier;
   private final java.util.function.DoubleSupplier ySupplier;
 
@@ -65,10 +67,14 @@ public class MegaTrackIterativeCommand extends Command {
   private double hoodErrDeg = 0.0;
   private double headingErrRad = 0.0;
 
-  public MegaTrackIterativeCommand(RobotContainer robot, Translation2d targetTranslation) {
+  /**
+   * @param robot RobotContainer
+   * @param isLob If true, aim at nearest lob/pass target; otherwise aim at alliance hub.
+   */
+  public MegaTrackIterativeCommand(RobotContainer robot, boolean isLob) {
     this.robot = robot;
     this.drive = robot.drive;
-    this.targetTranslation = targetTranslation;
+    this.isLob = isLob;
     this.xSupplier = robot.getDriveXSupplier();
     this.ySupplier = robot.getDriveYSupplier();
     headingController.enableContinuousInput(-Math.PI, Math.PI);
@@ -140,9 +146,20 @@ public class MegaTrackIterativeCommand extends Command {
   @Override
   public void initialize() {
     headingController.reset();
-    robot.intake.setWantedState(WantedState.FLICK_BACK);
+    robot.intake.setWantedState(WantedState.UP_STOW_STOP);
     heldHeading = drive.getRotation();
     state = State.ALIGN;
+
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    if (isLob) {
+      targetTranslation =
+          FieldConstants.getNearestLobTarget(drive.getPose().getTranslation(), alliance);
+    } else {
+      targetTranslation = FieldConstants.getHubLocation(alliance);
+    }
+    Logger.recordOutput(MegaTrackIterativeCommandConstants.LOG_PREFIX + "/IsLob", isLob);
+    Logger.recordOutput(
+        MegaTrackIterativeCommandConstants.LOG_PREFIX + "/TargetTranslation", targetTranslation);
   }
 
   private void stopFeed() {
@@ -234,7 +251,7 @@ public class MegaTrackIterativeCommand extends Command {
   private boolean okToEnterShoot() {
     boolean ok =
         distOk
-            && triggerHeld
+            // && triggerHeld
             && Math.abs(flywheelErrRps)
                 <= Constants.MegaTrackIterativeCommandConstants.ENTER_FLYWHEEL_RPS_TOL
             && Math.abs(hoodErrDeg)
@@ -249,7 +266,7 @@ public class MegaTrackIterativeCommand extends Command {
   private boolean okToStayShoot() {
     boolean ok =
         distOk
-            && triggerHeld
+            // && triggerHeld
             && Math.abs(flywheelErrRps)
                 <= Constants.MegaTrackIterativeCommandConstants.EXIT_FLYWHEEL_RPS_TOL
             && Math.abs(hoodErrDeg)
@@ -263,6 +280,7 @@ public class MegaTrackIterativeCommand extends Command {
 
   private void align() {
     traceTarget();
+    robot.intake.setWantedState(WantedState.UP_STOW_STOP);
     stopFeed();
     if (okToEnterShoot()) {
       state = State.SHOOT;
@@ -276,6 +294,10 @@ public class MegaTrackIterativeCommand extends Command {
       state = State.ALIGN;
       return;
     }
+    // Shooting: link intake stow depth to total shots fired
+    int totalShots = robot.shooter.getShots1() + robot.shooter.getShots2();
+    robot.intake.setWantedState(WantedState.FLICK_BACK);
+    robot.intake.setShotCount(totalShots);
     runFeed();
   }
 
@@ -299,6 +321,7 @@ public class MegaTrackIterativeCommand extends Command {
     robot.indexer.stop();
     robot.hood.stop();
     robot.shooter.stop();
+    robot.shooter.resetShotCounts();
     robot.intake.setWantedState(WantedState.UP_STOW_STOP);
   }
 }

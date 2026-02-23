@@ -76,6 +76,10 @@ public class IntakeIOTalonFX implements IntakeIO {
             .withMotionMagicCruiseVelocity(Constants.IntakeConstants.DEPLOY_MM_CRUISE_VELOCITY)
             .withMotionMagicAcceleration(Constants.IntakeConstants.DEPLOY_MM_ACCELERATION)
             .withMotionMagicJerk(Constants.IntakeConstants.DEPLOY_MM_JERK);
+    deployCfg.TorqueCurrent.PeakForwardTorqueCurrent =
+        Constants.IntakeConstants.DEPLOY_PEAK_TORQUECURRENT_FORWARD;
+    deployCfg.TorqueCurrent.PeakReverseTorqueCurrent =
+        Constants.IntakeConstants.DEPLOY_PEAK_TORQUECURRENT_REVERSE;
     deploy.getConfigurator().apply(deployCfg);
     // TODO: if you have an absolute reference / homing routine, do NOT blindly zero here.
     deploy.setPosition(1. / 4.);

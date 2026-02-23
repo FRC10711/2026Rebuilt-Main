@@ -36,7 +36,7 @@ public final class Constants {
 
   // ---------------- Autopilot (vendor lib) ----------------
   private static final APConstraints kAutopilotConstraints =
-      new APConstraints().withAcceleration(10.0);
+      new APConstraints().withAcceleration(10.0).withJerk(100);
 
   private static final APProfile kAutopilotProfile =
       new APProfile(kAutopilotConstraints)
@@ -50,7 +50,11 @@ public final class Constants {
   /** Tuning for trench traversal commands (SmashTrench, etc.). */
   public static final class TrenchCommandConstants {
     // ALIGN -> RUN transition tolerance
-    public static final double ALIGN_Y_TOL_METERS = 0.010;
+    /** Lateral tolerance (meters) to enter RUN, measured ⟂ to approach direction. */
+    public static final double ALIGN_LATERAL_TOL_METERS = 0.03;
+    /** Along-line tolerance (meters) to enter RUN, measured along approach direction. */
+    public static final double ALIGN_ALONG_TOL_METERS = 0.05;
+
     public static final double ALIGN_THETA_TOL_DEG = 10.0;
 
     // RUN behavior: push forward this distance along the chosen approach direction
@@ -63,13 +67,13 @@ public final class Constants {
     // Heading controller (ProfiledPIDController)
     public static final double HEADING_KP = 8.0;
     public static final double HEADING_KI = 0.0;
-    public static final double HEADING_KD = 0.4;
+    public static final double HEADING_KD = 0.2;
 
     /** Max angular velocity (rad/s). */
-    public static final double HEADING_MAX_VEL_RAD_PER_SEC = 20.0;
+    public static final double HEADING_MAX_VEL_RAD_PER_SEC = 5.0;
 
     /** Max angular acceleration (rad/s^2). */
-    public static final double HEADING_MAX_ACCEL_RAD_PER_SEC2 = 30.0;
+    public static final double HEADING_MAX_ACCEL_RAD_PER_SEC2 = 10.0;
 
     private TrenchCommandConstants() {}
   }
@@ -124,7 +128,7 @@ public final class Constants {
     public static final double EXIT_HEADING_TOL_RAD = Math.toRadians(4.0);
 
     // Feed outputs
-    public static final double FEEDER_RPS = 20.0;
+    public static final double FEEDER_RPS = 25.0;
     public static final double INDEXER_VOLTS = 8.0;
 
     private MegaTrackCommandConstants() {}
@@ -153,15 +157,15 @@ public final class Constants {
     // Hysteresis: tighter enter, looser stay
     public static final double ENTER_HEADING_TOL_RAD = Math.toRadians(2.0);
     public static final double EXIT_HEADING_TOL_RAD = Math.toRadians(4.0);
-    public static final double MAX_OMEGA = Math.PI / 2;
+    public static final double MAX_OMEGA = Math.PI;
     public static final double ENTER_FLYWHEEL_RPS_TOL = 1.5;
     public static final double EXIT_FLYWHEEL_RPS_TOL = 12;
     public static final double ENTER_HOOD_DEG_TOL = 1.0;
     public static final double EXIT_HOOD_DEG_TOL = 2.0;
 
     public static final double TRIGGER_AXIS_THRESHOLD = 0.25;
-    public static final double FEEDER_RPS = 20.0;
-    public static final double INDEXER_VOLTS = 8.0;
+    public static final double FEEDER_RPS = 24.0;
+    public static final double INDEXER_VOLTS = 10.0;
 
     private MegaTrackIterativeCommandConstants() {}
   }
@@ -190,9 +194,9 @@ public final class Constants {
 
     // ---------------- Roller (吸球滚轮) ----------------
     /** Rollers voltage for intaking (volts). */
-    public static final double ROLLER_INTAKE_VOLTS = 18;
+    public static final double ROLLER_INTAKE_VOLTS = 10.5;
     /** Rollers voltage for stopping (volts). */
-    public static final double ROLLER_STOP_VOLTS = 0.0;
+    public static final double ROLLER_STOP_VOLTS = 0.;
 
     // ---------------- Deploy (收放摆臂) ----------------
     /** Sensor-to-mechanism ratio for deploy motor (motor rotations per mechanism rotation). */
@@ -200,10 +204,10 @@ public final class Constants {
 
     /** Deploy position when stowed (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_UP_ROT =
-        edu.wpi.first.math.util.Units.degreesToRotations(10);
+        edu.wpi.first.math.util.Units.degreesToRotations(-4);
     /** Deploy position when deployed down (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_DOWN_ROT =
-        edu.wpi.first.math.util.Units.degreesToRotations(-12);
+        edu.wpi.first.math.util.Units.degreesToRotations(-11);
 
     public static final double FLIP_POS_UP = edu.wpi.first.math.util.Units.degreesToRotations(45);
 
@@ -213,7 +217,7 @@ public final class Constants {
     public static final double DEPLOY_MM_JERK = 0.0;
 
     // Slot0 gains for MotionMagicTorqueCurrentFOC
-    public static final double DEPLOY_KP = 2000;
+    public static final double DEPLOY_KP = 4000;
     public static final double DEPLOY_KI = 0.0;
     public static final double DEPLOY_KD = 200;
     public static final double DEPLOY_KS = 0.0;
@@ -221,11 +225,28 @@ public final class Constants {
     public static final double DEPLOY_KV = 0.0;
     public static final double DEPLOY_KA = 0.0;
 
+    public static final double DEPLOY_PEAK_TORQUECURRENT_FORWARD = 120;
+    public static final double DEPLOY_PEAK_TORQUECURRENT_REVERSE = -60;
+
     // Flick/backfeed behavior (间歇性收放拨球) - simple oscillation
     public static final double FLICK_ON_SEC = 0.6;
     public static final double FLICK_OFF_SEC = 0.6;
     /** In flick mode, rollers voltage (volts). TODO tune (can be 0 or slight reverse). */
     public static final double FLICK_ROLLER_VOLTS = 0.0;
+
+    // Shot-linked stow (射球时：根据射球数量“越收越回”)
+    /**
+     * Extra stow amount per shot (mechanism rotations/shot).
+     *
+     * <p>Sign depends on your mechanism. If "more stowed" is a smaller rotation, use negative.
+     */
+    public static final double SHOOT_STOW_EXTRA_PER_SHOT_ROT =
+        edu.wpi.first.math.util.Units.degreesToRotations(1.7);
+    /** Clamp the total extra stow (mechanism rotations). */
+    public static final double SHOOT_STOW_EXTRA_MIN_ROT = -0.2;
+
+    public static final double SHOOT_STOW_EXTRA_MAX_ROT =
+        edu.wpi.first.math.util.Units.degreesToRotations(45);
 
     private IntakeConstants() {}
   }
@@ -247,10 +268,10 @@ public final class Constants {
      *
      * <p>This is the "坡前指定位置" distance.
      */
-    public static final double TRENCH_PRE_DISTANCE_METERS = 0.60;
+    public static final double TRENCH_PRE_DISTANCE_METERS = 1.20;
 
     /** Trench usable alignment length along the trench axis (meters). */
-    public static final double TRENCH_LENGTH_METERS = 0.25;
+    public static final double TRENCH_LENGTH_METERS = 0.10;
 
     /**
      * Base trench center (blue alliance, lower-left one) in field coordinates.
@@ -609,6 +630,40 @@ public final class Constants {
 
       return alliance == Alliance.Red ? RED_HUB_LOCATION : BLUE_HUB_LOCATION;
     }
+
+    // ---------------- Lob / pass targets ----------------
+    /**
+     * Lob/pass target points for BLUE alliance (field coordinates).
+     *
+     * <p>TODO: Replace these placeholders with measured coordinates for your strategy.
+     */
+    public static final Translation2d[] BLUE_LOB_TARGETS =
+        new Translation2d[] {
+          new Translation2d(4.5, 5.58), new Translation2d(4.5, 2.31),
+        };
+
+    /** Lob/pass target points for RED alliance, mirrored from BLUE across the X midline. */
+    public static final Translation2d[] RED_LOB_TARGETS =
+        new Translation2d[] {
+          mirrorAboutXMidline(BLUE_LOB_TARGETS[0], FIELD_CENTER),
+          mirrorAboutXMidline(BLUE_LOB_TARGETS[1], FIELD_CENTER),
+        };
+
+    /** Returns the nearest lob/pass target point for the given alliance. */
+    public static Translation2d getNearestLobTarget(
+        Translation2d robotTranslation, Alliance alliance) {
+      Translation2d[] candidates = alliance == Alliance.Red ? RED_LOB_TARGETS : BLUE_LOB_TARGETS;
+      Translation2d best = candidates[0];
+      double bestDist = robotTranslation.getDistance(best);
+      for (int i = 1; i < candidates.length; i++) {
+        double d = robotTranslation.getDistance(candidates[i]);
+        if (d < bestDist) {
+          best = candidates[i];
+          bestDist = d;
+        }
+      }
+      return best;
+    }
   }
 
   /** Vision tuning for Limelight MegaTag2 pose updates. */
@@ -666,31 +721,30 @@ public final class Constants {
       hoodAngleMap.put(2.397, 6.);
       hoodAngleMap.put(3.026, 11.);
       hoodAngleMap.put(3.435, 16.);
-      hoodAngleMap.put(3.996, 19.);
+      hoodAngleMap.put(3.996, 18.3);
+      hoodAngleMap.put(4.47, 22.);
+      hoodAngleMap.put(5.02, 25.);
       // hoodAngleMap.put(2.983, 10.);
       // hoodAngleMap.put(3.42, 12.);
       // hoodAngleMap.put(4.08, 18.);
       // hoodAngleMap.put(5.05, 18.);
 
-      shooterSpeedMap.put(1.610, 23.8);
+      shooterSpeedMap.put(1.610, 23.6);
       shooterSpeedMap.put(1.959, 24.2);
-      shooterSpeedMap.put(2.397, 25.);
-      shooterSpeedMap.put(3.026, 26.2);
+      shooterSpeedMap.put(2.397, 25.2);
+      shooterSpeedMap.put(3.026, 26.3);
       shooterSpeedMap.put(3.435, 26.8);
-      shooterSpeedMap.put(3.996, 27.);
+      shooterSpeedMap.put(3.996, 27.8);
+      shooterSpeedMap.put(4.47, 28.4);
+      shooterSpeedMap.put(5.02, 30.);
       // shooterSpeedMap.put(2.65, 35.3);
       // shooterSpeedMap.put(2.983, 36.8);
       // shooterSpeedMap.put(3.42, 37.3);
       // shooterSpeedMap.put(4.08, 37.);
       // shooterSpeedMap.put(5.05, 45.8);
 
-      // Default flight-time map (placeholder). Start with constant FlyTime and tune with real data.
-      flightTimeMap.put(0.0, FlyTime);
-      flightTimeMap.put(1.0, FlyTime);
-      flightTimeMap.put(2.0, FlyTime);
-      flightTimeMap.put(3.0, FlyTime);
-      flightTimeMap.put(4.0, FlyTime);
-      flightTimeMap.put(5.0, FlyTime);
+      flightTimeMap.put(1.6, 1.0);
+      flightTimeMap.put(3.107, 1.1);
 
       // shooterSpeedMap.put(0.0, 54.48);
       // shooterSpeedMap.put(0.506, 54.69);
@@ -750,7 +804,15 @@ public final class Constants {
     public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
 
     public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 140.0;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 45.0;
+
+    // Shot counting (based on flywheel current drop)
+    /** If max(leader,follower) stator current is below this, treat as "low current". Tune. */
+    public static final double SHOT_COUNT_LOW_CURRENT_THRESHOLD_AMPS = 30.0;
+    /** Low-current debounce time (sec). */
+    public static final double SHOT_COUNT_DEBOUNCE_SEC = 0.005;
+    /** Only count shots when setpoint is above this (RPS), to avoid counting at idle. */
+    public static final double SHOT_COUNT_MIN_SETPOINT_RPS = 5.0;
 
     private ShooterConstants() {}
   }
@@ -842,9 +904,9 @@ public final class Constants {
     public static final int MOTOR_1_ID = 17;
     public static final int FOLLOWER_1_ID = 18;
     /** TODO: set to your second feeder leader CAN ID. */
-    public static final int MOTOR_2_ID = 0;
-    /** TODO: set to your second feeder follower CAN ID. */
-    public static final int FOLLOWER_2_ID = 0;
+    // public static final int MOTOR_2_ID = 0;
+    // /** TODO: set to your second feeder follower CAN ID. */
+    // public static final int FOLLOWER_2_ID = 0;
     // Motor direction
     public static final boolean INVERTED = true;
     /** Feeder follower alignment relative to leader. Use Opposed to run opposite direction. */
@@ -856,7 +918,7 @@ public final class Constants {
     public static final double SENSOR_TO_MECH_RATIO = 1.0;
 
     // Velocity closed-loop gains (Phoenix Slot0)
-    public static final double KP = 10.0;
+    public static final double KP = 12.0;
     public static final double KI = 0.0;
     public static final double KD = 0.0;
     public static final double KV = 0.;
@@ -865,11 +927,14 @@ public final class Constants {
     // Current limits (amps)
     public static final boolean ENABLE_SUPPLY_CURRENT_LIMIT = true;
     public static final double SUPPLY_CURRENT_LIMIT_AMPS = 30.0;
-    public static final double SUPPLY_CURRENT_LOWER_LIMIT_AMPS = 25.0;
+    public static final double SUPPLY_CURRENT_LOWER_LIMIT_AMPS = 30.0;
     public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
 
     public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 60.0;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 35.0;
+
+    /** Default command slow reverse speed (RPS). Tune. */
+    public static final double DEFAULT_REVERSE_RPS = 0.0;
 
     private FeederConstants() {}
   }
@@ -886,10 +951,13 @@ public final class Constants {
     public static final boolean ENABLE_SUPPLY_CURRENT_LIMIT = true;
     public static final double SUPPLY_CURRENT_LIMIT_AMPS = 25.0;
     public static final double SUPPLY_CURRENT_LOWER_LIMIT_AMPS = 20.0;
-    public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
+    public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 0.1;
 
     public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
     public static final double STATOR_CURRENT_LIMIT_AMPS = 50.0;
+
+    /** Default command slow reverse voltage (volts). Tune. */
+    public static final double DEFAULT_REVERSE_VOLTS = -1.0;
 
     private IndexerConstants() {}
   }

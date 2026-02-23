@@ -16,8 +16,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -27,11 +27,15 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.Auto.DownMagic;
+import frc.robot.commands.Auto.UpOut;
+import frc.robot.commands.DefaultFeederCommand;
+import frc.robot.commands.DefaultIndexerCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LEDDefaultCommand;
 import frc.robot.commands.MegaTrackIterativeCommand;
 import frc.robot.commands.SmashBumpCommand;
-import frc.robot.commands.TestShootCommand;
+import frc.robot.commands.SmashTrenchCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -59,7 +63,6 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.util.LoggedTunableNumber;
-import java.util.Set;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -189,8 +192,8 @@ public class RobotContainer {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption("Up", new UpOut(this).withTimeout(20.5));
+    autoChooser.addOption("Down", new DownMagic(this).withTimeout(20.5));
     autoChooser.addOption(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
     autoChooser.addOption(
@@ -209,6 +212,8 @@ public class RobotContainer {
 
     // Default commands
     led.setDefaultCommand(new LEDDefaultCommand(this));
+    feeder.setDefaultCommand(new DefaultFeederCommand(feeder));
+    indexer.setDefaultCommand(new DefaultIndexerCommand(indexer));
   }
 
   /**
@@ -236,20 +241,21 @@ public class RobotContainer {
 
     // Debug: log nearest trench pre-align pose
     controller.rightStick().whileTrue(new SmashBumpCommand(this));
+    controller.leftStick().whileTrue(new SmashTrenchCommand(this));
 
     // Manual tuning buttons
-    controller
-        .a()
-        .whileTrue(new InstantCommand(() -> shooter.setVelocity(shooterVelRpsTunable.get())));
-    controller.x().whileTrue(new InstantCommand(() -> hood.setAngle(hoodAngleDegTunable.get())));
+    // controller
+    //     .a()
+    //     .whileTrue(new InstantCommand(() -> shooter.setVelocity(shooterVelRpsTunable.get())));
+    // controller.x().whileTrue(new InstantCommand(() -> hood.setAngle(hoodAngleDegTunable.get())));
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // // Switch to X pattern when X button is pressed
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     controller
-        .leftBumper()
+        .x()
         .onTrue(new InstantCommand(() -> intake.setWantedState(Intake.WantedState.DOWN_INTAKE)));
     controller
-        .leftBumper()
+        .x()
         .onFalse(new InstantCommand(() -> intake.setWantedState(Intake.WantedState.UP_STOW_STOP)));
     controller
         .povDown()
@@ -265,32 +271,53 @@ public class RobotContainer {
         .b()
         .onTrue(
             Commands.runOnce(
-                    () ->
+                    () -> {
+                      if (DriverStation.isDisabled()) {
+                        if (autoChooser.getSendableChooser().getSelected() == "Up") {
+                          drive.setPose(UpOut.getStartPose(DriverStation.getAlliance().get()));
+                        } else {
+                          drive.setPose(DownMagic.getStartPose(DriverStation.getAlliance().get()));
+                        }
+                      } else {
                         drive.setPose(
-                            new Pose2d(new Translation2d(3.223, 4.030), new Rotation2d())),
+                            DriverStation.getAlliance().get() == Alliance.Blue
+                                ? new Pose2d(3.22, 4.030, new Rotation2d())
+                                : new Pose2d(3.22, 4.030, new Rotation2d())
+                                    .rotateAround(FieldConstants.FIELD_CENTER, Rotation2d.k180deg));
+                      }
+                    },
                     drive)
                 .ignoringDisable(true));
+    // controller
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () -> drive.setPose(UpOut.getStartPose(DriverStation.getAlliance().get())),
+    //                 drive)
+    //             .ignoringDisable(true));
 
-    controller
-        .rightBumper()
-        .whileTrue(
-            new MegaTrackIterativeCommand(this, FieldConstants.getHubLocation(Alliance.Blue)));
+    controller.y().whileTrue(new MegaTrackIterativeCommand(this, false));
+    controller.a().whileTrue(new MegaTrackIterativeCommand(this, true));
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         new MegaTrackIterativeCommand(this, true));
 
     // Hold Y to spin up shooter + aim hood, and press right trigger to run feeder
-    controller
-        .y()
-        .whileTrue(
-            Commands.defer(
-                () -> {
-                  return new TestShootCommand(
-                      this,
-                      () -> testShooterVel.get(),
-                      () -> testHoodAngle.get(),
-                      testFeederVel.get(),
-                      testIndexerVolts.get(),
-                      0.25);
-                },
-                Set.of(shooter, hood, feeder, indexer)));
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         Commands.defer(
+    //             () -> {
+    //               return new TestShootCommand(
+    //                   this,
+    //                   () -> testShooterVel.get(),
+    //                   () -> testHoodAngle.get(),
+    //                   testFeederVel.get(),
+    //                   testIndexerVolts.get(),
+    //                   0.25);
+    //             },
+    //             Set.of(shooter, hood, feeder, indexer)));
   }
 
   /**

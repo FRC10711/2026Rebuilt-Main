@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoShootConstants;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.intake.Intake.WantedState;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -34,7 +35,11 @@ public class TestShootCommand extends Command {
     this.indexerVolts = indexerVolts;
     this.triggerThreshold = triggerThreshold;
     addRequirements(
-        robotContainer.shooter, robotContainer.hood, robotContainer.feeder, robotContainer.indexer);
+        robotContainer.shooter,
+        robotContainer.hood,
+        robotContainer.feeder,
+        robotContainer.indexer,
+        robotContainer.intake);
   }
 
   /** Direct setpoint mode (no interpolation). */
@@ -53,7 +58,11 @@ public class TestShootCommand extends Command {
     this.indexerVolts = indexerVolts;
     this.triggerThreshold = triggerThreshold;
     addRequirements(
-        robotContainer.shooter, robotContainer.hood, robotContainer.feeder, robotContainer.indexer);
+        robotContainer.shooter,
+        robotContainer.hood,
+        robotContainer.feeder,
+        robotContainer.indexer,
+        robotContainer.intake);
   }
 
   @Override
@@ -89,9 +98,15 @@ public class TestShootCommand extends Command {
     robotContainer.hood.setAngle(hoodDeg);
 
     if (robotContainer.getRightTriggerAxisSupplier().getAsDouble() > triggerThreshold) {
+      // Shooting: stow intake and link stow depth to shot count
+      int totalShots = robotContainer.shooter.getShots1() + robotContainer.shooter.getShots2();
+      robotContainer.intake.setWantedState(WantedState.SHOT_LINKED_STOW);
+      robotContainer.intake.setShotCount(totalShots);
+
       robotContainer.feeder.setVelocity(feederRps);
       robotContainer.indexer.setVoltage(indexerVolts);
     } else {
+      robotContainer.intake.setWantedState(WantedState.UP_STOW_STOP);
       robotContainer.feeder.stop();
       robotContainer.indexer.stop();
     }
@@ -106,6 +121,7 @@ public class TestShootCommand extends Command {
   public void end(boolean interrupted) {
     robotContainer.feeder.stop();
     robotContainer.indexer.stop();
+    robotContainer.intake.setWantedState(WantedState.UP_STOW_STOP);
     robotContainer.hood.stop();
     robotContainer.shooter.stop();
   }

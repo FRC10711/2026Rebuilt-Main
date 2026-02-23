@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoShootConstants;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.intake.Intake.WantedState;
 import org.littletonrobotics.junction.Logger;
 
 public class MegaTrackCommand extends Command {
@@ -80,7 +81,8 @@ public class MegaTrackCommand extends Command {
         robotContainer.shooter,
         robotContainer.hood,
         robotContainer.feeder,
-        robotContainer.indexer);
+        robotContainer.indexer,
+        robotContainer.intake);
   }
 
   @Override
@@ -88,6 +90,7 @@ public class MegaTrackCommand extends Command {
     headingController.reset();
     heldHeading = drive.getRotation();
     state = State.ALIGN;
+    robotContainer.intake.setWantedState(WantedState.UP_STOW_STOP);
   }
 
   private void setState(State newState) {
@@ -162,6 +165,7 @@ public class MegaTrackCommand extends Command {
     robotContainer.hood.setAngle(hoodAngleDeg);
     robotContainer.shooter.setVelocity(shooterSpeedRps, shooterAccelFfRpsPerSec);
 
+    robotContainer.intake.setWantedState(WantedState.UP_STOW_STOP);
     stopFeed();
     if (okToEnterShoot()) {
       setState(State.SHOOT);
@@ -187,10 +191,15 @@ public class MegaTrackCommand extends Command {
     robotContainer.shooter.setVelocity(shooterSpeedRps, shooterAccelFfRpsPerSec);
 
     if (!okToStayShoot()) {
+      robotContainer.intake.setWantedState(WantedState.UP_STOW_STOP);
       stopFeed();
       setState(State.ALIGN);
       return;
     }
+
+    int totalShots = robotContainer.shooter.getShots1() + robotContainer.shooter.getShots2();
+    robotContainer.intake.setWantedState(WantedState.SHOT_LINKED_STOW);
+    robotContainer.intake.setShotCount(totalShots);
     runFeed();
   }
 
@@ -388,5 +397,6 @@ public class MegaTrackCommand extends Command {
     robotContainer.hood.stop();
     robotContainer.feeder.stop();
     robotContainer.indexer.stop();
+    robotContainer.intake.setWantedState(WantedState.UP_STOW_STOP);
   }
 }
