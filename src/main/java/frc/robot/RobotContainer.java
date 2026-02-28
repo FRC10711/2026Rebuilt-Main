@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.Auto.Down;
 import frc.robot.commands.Auto.DownMagic;
 import frc.robot.commands.Auto.UpOut;
 import frc.robot.commands.DefaultFeederCommand;
@@ -193,7 +194,9 @@ public class RobotContainer {
 
     // Set up SysId routines
     autoChooser.addOption("Up", new UpOut(this).withTimeout(20.5));
-    autoChooser.addOption("Down", new DownMagic(this).withTimeout(20.5));
+    autoChooser.addOption("Magic", new DownMagic(this).withTimeout(20.5));
+
+    autoChooser.addOption("Down", new Down(this).withTimeout(20.5));
     autoChooser.addOption(
         "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
     autoChooser.addOption(
@@ -268,7 +271,7 @@ public class RobotContainer {
 
     // Reset gyro to 0° when B button is pressed
     controller
-        .b()
+        .start()
         .onTrue(
             Commands.runOnce(
                     () -> {
@@ -297,7 +300,10 @@ public class RobotContainer {
     //             .ignoringDisable(true));
 
     controller.y().whileTrue(new MegaTrackIterativeCommand(this, false));
-    controller.a().whileTrue(new MegaTrackIterativeCommand(this, true));
+    controller.b().whileTrue(new MegaTrackIterativeCommand(this, true));
+    controller
+        .a()
+        .onTrue(new InstantCommand(() -> intake.setWantedState(Intake.WantedState.UP_DEBUG)));
     // controller
     //     .a()
     //     .whileTrue(

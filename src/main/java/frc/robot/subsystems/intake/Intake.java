@@ -17,6 +17,7 @@ public class Intake extends SubsystemBase {
     UP_STOW_STOP,
     /** 射球时：根据射球数量“越收越回” */
     SHOT_LINKED_STOW,
+    UP_DEBUG,
     /** 间歇性收放，用来把球往后拨 */
     FLICK_BACK
   }
@@ -83,6 +84,11 @@ public class Intake extends SubsystemBase {
       }
       case UP_STOW_STOP -> {
         double baseUp = Constants.IntakeConstants.DEPLOY_POS_UP_ROT;
+        deployPosRotSetpoint = baseUp;
+        rollerVoltsSetpoint = Constants.IntakeConstants.ROLLER_STOP_VOLTS;
+      }
+      case UP_DEBUG -> {
+        double baseUp = Constants.IntakeConstants.DEPLOY_POS_DEBUG_ROT;
         deployPosRotSetpoint = baseUp;
         rollerVoltsSetpoint = Constants.IntakeConstants.ROLLER_STOP_VOLTS;
       }

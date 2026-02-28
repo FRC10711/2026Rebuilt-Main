@@ -237,8 +237,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Applies a Limelight MegaTag2 pose update (translation only; heading not corrected). */
-  private void updatePoseWithLimelightMegaTag2() {
-    final String llName = "limelight";
+  private void updatePoseWithLimelightMegaTag2(String llName) {
 
     // Provide robot orientation to Limelight for MegaTag2 filtering.
     double yawDeg = getRotation().getDegrees();
@@ -248,14 +247,17 @@ public class Drive extends SubsystemBase {
     // Get MegaTag2 pose estimate (WPILib Blue coordinate system).
     LimelightHelpers.PoseEstimate est =
         LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(llName);
-    if (est == null || est.tagCount <= 0) {
+    if (est == null
+        || est.tagCount <= 0
+        || Math.hypot(getChassisSpeeds().vxMetersPerSecond, getChassisSpeeds().vyMetersPerSecond)
+            > 2
+        || getChassisSpeeds().omegaRadiansPerSecond > 3) {
       return;
     }
 
     // Translation std dev based on TA -> dev interpolation.
     double ta = LimelightHelpers.getTA(llName);
-    double xyStdDev =
-        Math.max(0.05, Constants.VisionConstants.taToXYStdDevMeters.get(Math.max(0.0, ta)));
+    double xyStdDev = Constants.VisionConstants.taToXYStdDevMeters.get(Math.max(0.0, ta));
 
     // Heading should not be corrected: force rotation to current heading and give huge theta std
     // dev.
@@ -343,7 +345,8 @@ public class Drive extends SubsystemBase {
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
     updateFieldAccelerationEstimate();
-    updatePoseWithLimelightMegaTag2();
+    updatePoseWithLimelightMegaTag2("limelight");
+    updatePoseWithLimelightMegaTag2("limelight-g");
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);

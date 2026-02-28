@@ -205,9 +205,12 @@ public final class Constants {
     /** Deploy position when stowed (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_UP_ROT =
         edu.wpi.first.math.util.Units.degreesToRotations(-4);
+
+    public static final double DEPLOY_POS_DEBUG_ROT =
+        edu.wpi.first.math.util.Units.degreesToRotations(40);
     /** Deploy position when deployed down (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_DOWN_ROT =
-        edu.wpi.first.math.util.Units.degreesToRotations(-11);
+        edu.wpi.first.math.util.Units.degreesToRotations(-27);
 
     public static final double FLIP_POS_UP = edu.wpi.first.math.util.Units.degreesToRotations(45);
 
@@ -483,7 +486,7 @@ public final class Constants {
     public static final double BUMP_PRE_DISTANCE_METERS = 1.0;
 
     /** Bump usable alignment length along the bump axis (meters). */
-    public static final double BUMP_LENGTH_METERS = 0.5;
+    public static final double BUMP_LENGTH_METERS = 0.4;
 
     /**
      * Base bump center (blue alliance, lower-left one) in field coordinates.
@@ -804,7 +807,7 @@ public final class Constants {
     public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
 
     public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 45.0;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 60.0;
 
     // Shot counting (based on flywheel current drop)
     /** If max(leader,follower) stator current is below this, treat as "low current". Tune. */
@@ -931,7 +934,7 @@ public final class Constants {
     public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
 
     public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 35.0;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 50.0;
 
     /** Default command slow reverse speed (RPS). Tune. */
     public static final double DEFAULT_REVERSE_RPS = 0.0;
