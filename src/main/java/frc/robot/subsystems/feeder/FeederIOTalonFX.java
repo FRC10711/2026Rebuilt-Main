@@ -31,8 +31,8 @@ public class FeederIOTalonFX implements FeederIO {
   private final StatusSignal<Current> current1;
 
   public FeederIOTalonFX() {
-    motor1 = new TalonFX(FeederConstants.MOTOR_1_ID);
-    followerMotor1 = new TalonFX(FeederConstants.FOLLOWER_1_ID);
+    motor1 = new TalonFX(FeederConstants.MOTOR_1_ID, "mainCAN");
+    followerMotor1 = new TalonFX(FeederConstants.FOLLOWER_1_ID, "mainCAN");
 
     var cfg = new TalonFXConfiguration();
     cfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;

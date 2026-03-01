@@ -190,29 +190,29 @@ public final class Constants {
 
     // Motor directions
     public static final boolean LEADER_INVERTED = true;
-    public static final boolean DEPLOY_INVERTED = false;
+    public static final boolean DEPLOY_INVERTED = true;
 
     // ---------------- Roller (吸球滚轮) ----------------
     /** Rollers voltage for intaking (volts). */
-    public static final double ROLLER_INTAKE_VOLTS = 10.5;
+    public static final double ROLLER_INTAKE_VOLTS = 8.5;
     /** Rollers voltage for stopping (volts). */
     public static final double ROLLER_STOP_VOLTS = 0.;
 
     // ---------------- Deploy (收放摆臂) ----------------
     /** Sensor-to-mechanism ratio for deploy motor (motor rotations per mechanism rotation). */
-    public static final double DEPLOY_SENSOR_TO_MECH_RATIO = 40. / 9. * 68. / 20. * 30. / 15;
+    public static final double DEPLOY_SENSOR_TO_MECH_RATIO = 49.;
 
     /** Deploy position when stowed (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_UP_ROT =
-        edu.wpi.first.math.util.Units.degreesToRotations(-4);
+        edu.wpi.first.math.util.Units.degreesToRotations(-24);
 
     public static final double DEPLOY_POS_DEBUG_ROT =
         edu.wpi.first.math.util.Units.degreesToRotations(40);
     /** Deploy position when deployed down (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_DOWN_ROT =
-        edu.wpi.first.math.util.Units.degreesToRotations(-27);
+        edu.wpi.first.math.util.Units.degreesToRotations(-52);
 
-    public static final double FLIP_POS_UP = edu.wpi.first.math.util.Units.degreesToRotations(45);
+    public static final double FLIP_POS_UP = edu.wpi.first.math.util.Units.degreesToRotations(0);
 
     // Motion Magic (mechanism rotations/sec and rotations/sec^2)
     public static final double DEPLOY_MM_CRUISE_VELOCITY = 2.0;
@@ -911,7 +911,7 @@ public final class Constants {
     // /** TODO: set to your second feeder follower CAN ID. */
     // public static final int FOLLOWER_2_ID = 0;
     // Motor direction
-    public static final boolean INVERTED = true;
+    public static final boolean INVERTED = false;
     /** Feeder follower alignment relative to leader. Use Opposed to run opposite direction. */
     public static final MotorAlignmentValue FOLLOWER_1_ALIGNMENT = MotorAlignmentValue.Opposed;
 
@@ -948,19 +948,19 @@ public final class Constants {
     /** TODO: set to your second indexer CAN ID. */
     public static final int MOTOR_2_ID = 20;
 
-    public static final boolean INVERTED = false;
+    public static final boolean INVERTED = true;
 
     // Current limits (amps)
     public static final boolean ENABLE_SUPPLY_CURRENT_LIMIT = true;
-    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 25.0;
-    public static final double SUPPLY_CURRENT_LOWER_LIMIT_AMPS = 20.0;
+    public static final double SUPPLY_CURRENT_LIMIT_AMPS = 70.0;
+    public static final double SUPPLY_CURRENT_LOWER_LIMIT_AMPS = 70.0;
     public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 0.1;
 
     public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 50.0;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 120.0;
 
     /** Default command slow reverse voltage (volts). Tune. */
-    public static final double DEFAULT_REVERSE_VOLTS = -1.0;
+    public static final double DEFAULT_REVERSE_VOLTS = 1.0;
 
     private IndexerConstants() {}
   }

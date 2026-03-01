@@ -41,8 +41,8 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final StatusSignal<Current> deployCurrent;
 
   public IntakeIOTalonFX() {
-    leader = new TalonFX(Constants.IntakeConstants.LEADER_MOTOR_ID);
-    deploy = new TalonFX(Constants.IntakeConstants.DEPLOY_MOTOR_ID);
+    leader = new TalonFX(Constants.IntakeConstants.LEADER_MOTOR_ID, "mainCAN");
+    deploy = new TalonFX(Constants.IntakeConstants.DEPLOY_MOTOR_ID, "mainCAN");
 
     // ---------------- Roller config ----------------
     var rollerLeaderCfg = new TalonFXConfiguration();

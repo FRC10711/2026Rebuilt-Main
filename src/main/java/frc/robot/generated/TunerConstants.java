@@ -52,7 +52,7 @@ public class TunerConstants {
 
   // The remote sensor feedback type to use for the steer motors;
   // When not Pro-licensed, Fused*/Sync* automatically fall back to Remote*
-  private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.FusedCANcoder;
+  private static final SteerFeedbackType kSteerFeedbackType = SteerFeedbackType.RemoteCANcoder;
 
   // The stator current at which the wheels start to slip;
   // This needs to be tuned to your individual robot
@@ -76,7 +76,7 @@ public class TunerConstants {
 
   // CAN bus that the devices are located on;
   // All swerve devices must share the same CAN bus
-  public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
+  public static final CANBus kCANBus = new CANBus("mainCAN", "./logs/example.hoot");
 
   // Theoretical free speed (m/s) at 12 V applied output;
   // This needs to be tuned to your individual robot
@@ -138,29 +138,29 @@ public class TunerConstants {
   private static final int kFrontLeftDriveMotorId = 6;
   private static final int kFrontLeftSteerMotorId = 3;
   private static final int kFrontLeftEncoderId = 11;
-  private static final Angle kFrontLeftEncoderOffset = Rotations.of(-0.267578125);
+  private static final Angle kFrontLeftEncoderOffset = Rotations.of(-0.096923828125);
   private static final boolean kFrontLeftSteerMotorInverted = false;
   private static final boolean kFrontLeftEncoderInverted = false;
 
-  private static final Distance kFrontLeftXPos = Inches.of(9.251);
-  private static final Distance kFrontLeftYPos = Inches.of(13.374);
+  private static final Distance kFrontLeftXPos = Inches.of(8.702);
+  private static final Distance kFrontLeftYPos = Inches.of(10.178);
 
   // Front Right
-  private static final int kFrontRightDriveMotorId = 8;
+  private static final int kFrontRightDriveMotorId = 5;
   private static final int kFrontRightSteerMotorId = 4;
   private static final int kFrontRightEncoderId = 12;
-  private static final Angle kFrontRightEncoderOffset = Rotations.of(0.27880859375);
+  private static final Angle kFrontRightEncoderOffset = Rotations.of(-0.262451171875);
   private static final boolean kFrontRightSteerMotorInverted = false;
   private static final boolean kFrontRightEncoderInverted = false;
 
-  private static final Distance kFrontRightXPos = Inches.of(9.251);
-  private static final Distance kFrontRightYPos = Inches.of(-13.374);
+  private static final Distance kFrontRightXPos = Inches.of(8.702);
+  private static final Distance kFrontRightYPos = Inches.of(-10.178);
 
   // Back Left
   private static final int kBackLeftDriveMotorId = 7;
   private static final int kBackLeftSteerMotorId = 2;
   private static final int kBackLeftEncoderId = 10;
-  private static final Angle kBackLeftEncoderOffset = Rotations.of(0.29052734375);
+  private static final Angle kBackLeftEncoderOffset = Rotations.of(0.058350);
   private static final boolean kBackLeftSteerMotorInverted = false;
   private static final boolean kBackLeftEncoderInverted = false;
 
@@ -168,15 +168,15 @@ public class TunerConstants {
   private static final Distance kBackLeftYPos = Inches.of(13.374);
 
   // Back Right
-  private static final int kBackRightDriveMotorId = 5;
+  private static final int kBackRightDriveMotorId = 8;
   private static final int kBackRightSteerMotorId = 1;
   private static final int kBackRightEncoderId = 9;
-  private static final Angle kBackRightEncoderOffset = Rotations.of(0.26806640625);
+  private static final Angle kBackRightEncoderOffset = Rotations.of(0.043213);
   private static final boolean kBackRightSteerMotorInverted = false;
   private static final boolean kBackRightEncoderInverted = false;
 
-  private static final Distance kBackRightXPos = Inches.of(-9.251);
-  private static final Distance kBackRightYPos = Inches.of(-13.374);
+  private static final Distance kBackRightXPos = Inches.of(-8.702);
+  private static final Distance kBackRightYPos = Inches.of(-10.178);
 
   public static final SwerveModuleConstants<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>

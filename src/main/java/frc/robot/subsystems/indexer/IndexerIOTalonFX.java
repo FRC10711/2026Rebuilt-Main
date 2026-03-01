@@ -24,8 +24,8 @@ public class IndexerIOTalonFX implements IndexerIO {
   private final StatusSignal<Current> current2;
 
   public IndexerIOTalonFX() {
-    motor1 = new TalonFX(Constants.IndexerConstants.MOTOR_1_ID);
-    motor2 = new TalonFX(Constants.IndexerConstants.MOTOR_2_ID);
+    motor1 = new TalonFX(Constants.IndexerConstants.MOTOR_1_ID, "mainCAN");
+    motor2 = new TalonFX(Constants.IndexerConstants.MOTOR_2_ID, "mainCAN");
 
     var cfg = new TalonFXConfiguration();
     cfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;
