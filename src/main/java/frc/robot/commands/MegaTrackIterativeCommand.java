@@ -227,7 +227,7 @@ public class MegaTrackIterativeCommand extends Command {
         dist >= Constants.MegaTrackIterativeCommandConstants.MIN_SHOOT_DIST_METERS
             && dist <= Constants.MegaTrackIterativeCommandConstants.MAX_SHOOT_DIST_METERS;
     triggerHeld =
-        robot.getRightTriggerAxisSupplier().getAsDouble()
+        robot.getLeftTriggerAxisSupplier().getAsDouble()
             > Constants.MegaTrackIterativeCommandConstants.TRIGGER_AXIS_THRESHOLD;
     flywheelErrRps = shooterRps - robot.shooter.getFlywheelVelocityRps();
     hoodErrDeg = hoodDeg - robot.hood.getAngleDeg();
@@ -260,13 +260,12 @@ public class MegaTrackIterativeCommand extends Command {
                 <= Constants.MegaTrackIterativeCommandConstants.ENTER_HEADING_TOL_RAD;
     Logger.recordOutput(
         Constants.MegaTrackIterativeCommandConstants.LOG_PREFIX + "/OkEnterShoot", ok);
-    return ok;
+    return ok || triggerHeld;
   }
 
   private boolean okToStayShoot() {
     boolean ok =
         distOk
-            // && triggerHeld
             && Math.abs(flywheelErrRps)
                 <= Constants.MegaTrackIterativeCommandConstants.EXIT_FLYWHEEL_RPS_TOL
             && Math.abs(hoodErrDeg)
@@ -275,7 +274,7 @@ public class MegaTrackIterativeCommand extends Command {
                 <= Constants.MegaTrackIterativeCommandConstants.EXIT_HEADING_TOL_RAD;
     Logger.recordOutput(
         Constants.MegaTrackIterativeCommandConstants.LOG_PREFIX + "/OkStayShoot", ok);
-    return ok;
+    return ok || triggerHeld;
   }
 
   private void align() {

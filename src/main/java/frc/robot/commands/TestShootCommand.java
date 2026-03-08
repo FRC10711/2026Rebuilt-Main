@@ -97,7 +97,7 @@ public class TestShootCommand extends Command {
     robotContainer.shooter.setVelocity(shooterRps);
     robotContainer.hood.setAngle(hoodDeg);
 
-    if (robotContainer.getRightTriggerAxisSupplier().getAsDouble() > triggerThreshold) {
+    if (robotContainer.getLeftTriggerAxisSupplier().getAsDouble() > triggerThreshold) {
       // Shooting: stow intake and link stow depth to shot count
       int totalShots = robotContainer.shooter.getShots1() + robotContainer.shooter.getShots2();
       robotContainer.intake.setWantedState(WantedState.SHOT_LINKED_STOW);

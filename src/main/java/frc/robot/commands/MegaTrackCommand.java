@@ -265,7 +265,7 @@ public class MegaTrackCommand extends Command {
     hoodErrDeg = hoodAngleDeg - robotContainer.hood.getAngleDeg();
     headingErrRad =
         MathUtil.angleModulus(targetHeading.getRadians() - drive.getRotation().getRadians());
-    triggerHeld = robotContainer.getRightTriggerAxisSupplier().getAsDouble() > 0.25;
+    triggerHeld = robotContainer.getLeftTriggerAxisSupplier().getAsDouble() > 0.25;
 
     Logger.recordOutput("AutoShoot/ShootDistanceOk", shootDistanceOk);
     Logger.recordOutput("AutoShoot/FlywheelMeasRps", flywheelMeasRps);

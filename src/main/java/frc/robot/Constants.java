@@ -129,7 +129,7 @@ public final class Constants {
 
     // Feed outputs
     public static final double FEEDER_RPS = 25.0;
-    public static final double INDEXER_VOLTS = 8.0;
+    public static final double INDEXER_VOLTS = 6.0;
 
     private MegaTrackCommandConstants() {}
   }
@@ -164,8 +164,8 @@ public final class Constants {
     public static final double EXIT_HOOD_DEG_TOL = 2.0;
 
     public static final double TRIGGER_AXIS_THRESHOLD = 0.25;
-    public static final double FEEDER_RPS = 24.0;
-    public static final double INDEXER_VOLTS = 10.0;
+    public static final double FEEDER_RPS = 34.0;
+    public static final double INDEXER_VOLTS = 10.5;
 
     private MegaTrackIterativeCommandConstants() {}
   }
@@ -192,9 +192,9 @@ public final class Constants {
     public static final boolean LEADER_INVERTED = true;
     public static final boolean DEPLOY_INVERTED = true;
 
-    // ---------------- Roller (吸球滚轮) ----------------
-    /** Rollers voltage for intaking (volts). */
-    public static final double ROLLER_INTAKE_VOLTS = 8.5;
+    // ---------------- Roller (吸球滚轮) ----------------    /** Rollers voltage for intaking (volts).
+    // */
+    public static final double ROLLER_INTAKE_VOLTS = 6.3;
     /** Rollers voltage for stopping (volts). */
     public static final double ROLLER_STOP_VOLTS = 0.;
 
@@ -204,15 +204,15 @@ public final class Constants {
 
     /** Deploy position when stowed (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_UP_ROT =
-        edu.wpi.first.math.util.Units.degreesToRotations(-24);
+        edu.wpi.first.math.util.Units.degreesToRotations(-50);
 
     public static final double DEPLOY_POS_DEBUG_ROT =
         edu.wpi.first.math.util.Units.degreesToRotations(40);
     /** Deploy position when deployed down (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_DOWN_ROT =
-        edu.wpi.first.math.util.Units.degreesToRotations(-52);
+        edu.wpi.first.math.util.Units.degreesToRotations(-62);
 
-    public static final double FLIP_POS_UP = edu.wpi.first.math.util.Units.degreesToRotations(0);
+    public static final double FLIP_POS_UP = edu.wpi.first.math.util.Units.degreesToRotations(10);
 
     // Motion Magic (mechanism rotations/sec and rotations/sec^2)
     public static final double DEPLOY_MM_CRUISE_VELOCITY = 2.0;
@@ -911,7 +911,7 @@ public final class Constants {
     // /** TODO: set to your second feeder follower CAN ID. */
     // public static final int FOLLOWER_2_ID = 0;
     // Motor direction
-    public static final boolean INVERTED = false;
+    public static final boolean INVERTED = true;
     /** Feeder follower alignment relative to leader. Use Opposed to run opposite direction. */
     public static final MotorAlignmentValue FOLLOWER_1_ALIGNMENT = MotorAlignmentValue.Opposed;
 
@@ -934,7 +934,7 @@ public final class Constants {
     public static final double SUPPLY_CURRENT_LOWER_TIME_SEC = 1.0;
 
     public static final boolean ENABLE_STATOR_CURRENT_LIMIT = true;
-    public static final double STATOR_CURRENT_LIMIT_AMPS = 50.0;
+    public static final double STATOR_CURRENT_LIMIT_AMPS = 70.0;
 
     /** Default command slow reverse speed (RPS). Tune. */
     public static final double DEFAULT_REVERSE_RPS = 0.0;
@@ -960,7 +960,7 @@ public final class Constants {
     public static final double STATOR_CURRENT_LIMIT_AMPS = 120.0;
 
     /** Default command slow reverse voltage (volts). Tune. */
-    public static final double DEFAULT_REVERSE_VOLTS = 1.0;
+    public static final double DEFAULT_REVERSE_VOLTS = 0.0;
 
     private IndexerConstants() {}
   }

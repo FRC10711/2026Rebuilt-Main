@@ -46,10 +46,10 @@ public class ShooterIOTalonFX implements ShooterIO {
   private final StatusSignal<Current> follower2Current;
 
   public ShooterIOTalonFX() {
-    flywheel1Leader = new TalonFX(ShooterConstants.FLYWHEEL_1_LEADER_ID, "mainCAN");
-    flywheel1Follower = new TalonFX(ShooterConstants.FLYWHEEL_1_FOLLOWER_ID, "mainCAN");
-    flywheel2Leader = new TalonFX(ShooterConstants.FLYWHEEL_2_LEADER_ID, "mainCAN");
-    flywheel2Follower = new TalonFX(ShooterConstants.FLYWHEEL_2_FOLLOWER_ID, "mainCAN");
+    flywheel1Leader = new TalonFX(ShooterConstants.FLYWHEEL_1_LEADER_ID, "rio");
+    flywheel1Follower = new TalonFX(ShooterConstants.FLYWHEEL_1_FOLLOWER_ID, "rio");
+    flywheel2Leader = new TalonFX(ShooterConstants.FLYWHEEL_2_LEADER_ID, "rio");
+    flywheel2Follower = new TalonFX(ShooterConstants.FLYWHEEL_2_FOLLOWER_ID, "rio");
 
     var flywheelCfg = new TalonFXConfiguration();
     flywheelCfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;

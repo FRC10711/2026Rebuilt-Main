@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -31,8 +32,8 @@ public class FeederIOTalonFX implements FeederIO {
   private final StatusSignal<Current> current1;
 
   public FeederIOTalonFX() {
-    motor1 = new TalonFX(FeederConstants.MOTOR_1_ID, "mainCAN");
-    followerMotor1 = new TalonFX(FeederConstants.FOLLOWER_1_ID, "mainCAN");
+    motor1 = new TalonFX(FeederConstants.MOTOR_1_ID, "rio");
+    followerMotor1 = new TalonFX(FeederConstants.FOLLOWER_1_ID, "rio");
 
     var cfg = new TalonFXConfiguration();
     cfg.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -89,6 +90,10 @@ public class FeederIOTalonFX implements FeederIO {
   public void setVelocity(double rps) {
     motor1.setControl(velocityReq1.withVelocity(rps));
     followerMotor1.setControl(followerReq1);
+  }
+
+  public void setVoltage(double voltage) {
+    motor1.setControl(new VoltageOut(voltage));
   }
 
   @Override

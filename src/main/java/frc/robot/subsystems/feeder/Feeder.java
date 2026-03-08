@@ -28,6 +28,10 @@ public class Feeder extends SubsystemBase {
     io.setVelocity(rps);
   }
 
+  public void setVoltage(double Voltage) {
+    io.setVoltage(Voltage);
+  }
+
   public void stop() {
     velocitySetpointRps = 0.0;
     io.stop();

@@ -30,8 +30,6 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.Auto.Down;
 import frc.robot.commands.Auto.DownMagic;
 import frc.robot.commands.Auto.UpOut;
-import frc.robot.commands.DefaultFeederCommand;
-import frc.robot.commands.DefaultIndexerCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.LEDDefaultCommand;
 import frc.robot.commands.MegaTrackIterativeCommand;
@@ -123,8 +121,8 @@ public class RobotContainer {
   }
 
   /** Right trigger axis supplier in range [0, 1]. */
-  public DoubleSupplier getRightTriggerAxisSupplier() {
-    return () -> controller.getRightTriggerAxis();
+  public DoubleSupplier getLeftTriggerAxisSupplier() {
+    return () -> controller.getLeftTriggerAxis();
   }
 
   // Dashboard inputs
@@ -215,8 +213,8 @@ public class RobotContainer {
 
     // Default commands
     led.setDefaultCommand(new LEDDefaultCommand(this));
-    feeder.setDefaultCommand(new DefaultFeederCommand(feeder));
-    indexer.setDefaultCommand(new DefaultIndexerCommand(indexer));
+    // feeder.setDefaultCommand(new DefaultFeederCommand(feeder));
+    // indexer.setDefaultCommand(new DefaultIndexerCommand(indexer));
   }
 
   /**
@@ -304,6 +302,28 @@ public class RobotContainer {
     controller
         .a()
         .onTrue(new InstantCommand(() -> intake.setWantedState(Intake.WantedState.UP_DEBUG)));
+
+    controller
+        .rightTrigger(0.5)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  indexer.setVoltage(-10);
+                  feeder.setVoltage(-10.);
+                },
+                indexer,
+                feeder));
+    controller
+        .rightTrigger(0.5)
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  indexer.stop();
+                  ;
+                  feeder.stop();
+                },
+                indexer,
+                feeder));
     // controller
     //     .a()
     //     .whileTrue(

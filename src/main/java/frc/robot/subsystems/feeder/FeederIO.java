@@ -36,5 +36,7 @@ public interface FeederIO {
   /** Sets both feeders to the same velocity (mechanism RPS). */
   default void setVelocity(double rps) {}
 
+  default void setVoltage(double Voltage) {}
+
   default void stop() {}
 }

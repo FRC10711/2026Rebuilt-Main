@@ -41,8 +41,8 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final StatusSignal<Current> deployCurrent;
 
   public IntakeIOTalonFX() {
-    leader = new TalonFX(Constants.IntakeConstants.LEADER_MOTOR_ID, "mainCAN");
-    deploy = new TalonFX(Constants.IntakeConstants.DEPLOY_MOTOR_ID, "mainCAN");
+    leader = new TalonFX(Constants.IntakeConstants.LEADER_MOTOR_ID, "rio");
+    deploy = new TalonFX(Constants.IntakeConstants.DEPLOY_MOTOR_ID, "rio");
 
     // ---------------- Roller config ----------------
     var rollerLeaderCfg = new TalonFXConfiguration();
@@ -82,7 +82,7 @@ public class IntakeIOTalonFX implements IntakeIO {
         Constants.IntakeConstants.DEPLOY_PEAK_TORQUECURRENT_REVERSE;
     deploy.getConfigurator().apply(deployCfg);
     // TODO: if you have an absolute reference / homing routine, do NOT blindly zero here.
-    deploy.setPosition(1. / 4.);
+    deploy.setPosition(0.34);
 
     // Acquire status signals
     leaderVelocity = leader.getVelocity();

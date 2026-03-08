@@ -26,7 +26,7 @@ public class DownMagic extends SequentialCommandGroup {
           new InstantCommand(
               () -> robotContainer.intake.setWantedState(Intake.WantedState.DOWN_INTAKE)));
       addCommands(AutoBuilder.followPath(Down1));
-      addCommands(new SmashBumpCommand(robotContainer).withTimeout(2.7));
+      addCommands(new SmashBumpCommand(robotContainer).withTimeout(3.7));
       addCommands(new MegaTrackIterativeCommand(robotContainer, false).withTimeout(4));
       addCommands(
           new InstantCommand(

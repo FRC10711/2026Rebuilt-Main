@@ -28,14 +28,14 @@ public class Down extends SequentialCommandGroup {
           new InstantCommand(
               () -> robotContainer.intake.setWantedState(Intake.WantedState.DOWN_INTAKE)));
       addCommands(AutoBuilder.followPath(Down1));
-      addCommands(new SmashBumpCommand(robotContainer).withTimeout(3.2));
+      addCommands(new SmashBumpCommand(robotContainer).withTimeout(3.7));
       addCommands(new MegaTrackIterativeCommand(robotContainer, false).withTimeout(4));
       addCommands(new SmashTrenchCommand(robotContainer).withTimeout(3.2));
       addCommands(
           new InstantCommand(
               () -> robotContainer.intake.setWantedState(Intake.WantedState.DOWN_INTAKE)));
       addCommands(AutoBuilder.followPath(Down2));
-      addCommands(new SmashBumpCommand(robotContainer).withTimeout(3.2));
+      addCommands(new SmashBumpCommand(robotContainer).withTimeout(3.7));
       addCommands(new MegaTrackIterativeCommand(robotContainer, false));
     } catch (Exception e) {
       DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());

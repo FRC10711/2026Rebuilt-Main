@@ -28,7 +28,7 @@ public class HoodIOTalonFX implements HoodIO {
   private final StatusSignal<Current> hoodCurrent;
 
   public HoodIOTalonFX() {
-    hoodMotor = new TalonFX(HoodConstants.MOTOR_ID, "mainCAN");
+    hoodMotor = new TalonFX(HoodConstants.MOTOR_ID, "rio");
 
     var hoodCfg = new TalonFXConfiguration();
     hoodCfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
