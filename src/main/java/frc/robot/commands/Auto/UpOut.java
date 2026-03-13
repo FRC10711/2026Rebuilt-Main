@@ -28,14 +28,14 @@ public class UpOut extends SequentialCommandGroup {
           new InstantCommand(
               () -> robotContainer.intake.setWantedState(Intake.WantedState.DOWN_INTAKE)));
       addCommands(AutoBuilder.followPath(Up1));
-      addCommands(new SmashBumpCommand(robotContainer).withTimeout(2.7));
+      addCommands(new SmashBumpCommand(robotContainer).withTimeout(3.4));
       addCommands(new MegaTrackIterativeCommand(robotContainer, false).withTimeout(4));
-      addCommands(new SmashTrenchCommand(robotContainer).withTimeout(2.7));
+      addCommands(new SmashTrenchCommand(robotContainer).withTimeout(3.4));
       addCommands(
           new InstantCommand(
               () -> robotContainer.intake.setWantedState(Intake.WantedState.DOWN_INTAKE)));
       addCommands(AutoBuilder.followPath(Up2));
-      addCommands(new SmashBumpCommand(robotContainer).withTimeout(3.2));
+      addCommands(new SmashBumpCommand(robotContainer).withTimeout(3.4));
       addCommands(new MegaTrackIterativeCommand(robotContainer, false));
     } catch (Exception e) {
       DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());

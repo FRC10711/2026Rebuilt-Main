@@ -142,7 +142,7 @@ public class Robot extends LoggedRobot {
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
-      new WaitCommand(0.3).andThen(autonomousCommand).schedule();
+      new WaitCommand(0.7).andThen(autonomousCommand).schedule();
     }
   }
 

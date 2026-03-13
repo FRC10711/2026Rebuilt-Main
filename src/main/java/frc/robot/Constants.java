@@ -194,7 +194,7 @@ public final class Constants {
 
     // ---------------- Roller (吸球滚轮) ----------------
     /** Rollers voltage for intaking (volts). */
-    public static final double ROLLER_INTAKE_VOLTS = 10.5;
+    public static final double ROLLER_INTAKE_VOLTS = 7.;
     /** Rollers voltage for stopping (volts). */
     public static final double ROLLER_STOP_VOLTS = 0.;
 
@@ -210,7 +210,7 @@ public final class Constants {
         edu.wpi.first.math.util.Units.degreesToRotations(40);
     /** Deploy position when deployed down (mechanism rotations). TODO tune. */
     public static final double DEPLOY_POS_DOWN_ROT =
-        edu.wpi.first.math.util.Units.degreesToRotations(-27);
+        edu.wpi.first.math.util.Units.degreesToRotations(-8);
 
     public static final double FLIP_POS_UP = edu.wpi.first.math.util.Units.degreesToRotations(45);
 
@@ -220,7 +220,7 @@ public final class Constants {
     public static final double DEPLOY_MM_JERK = 0.0;
 
     // Slot0 gains for MotionMagicTorqueCurrentFOC
-    public static final double DEPLOY_KP = 4000;
+    public static final double DEPLOY_KP = 4500;
     public static final double DEPLOY_KI = 0.0;
     public static final double DEPLOY_KD = 200;
     public static final double DEPLOY_KS = 0.0;
@@ -790,8 +790,8 @@ public final class Constants {
     public static final double FLYWHEEL_1_KP = 15;
     public static final double FLYWHEEL_1_KI = 0.0;
     public static final double FLYWHEEL_1_KD = 0.0;
-    public static final double FLYWHEEL_1_KV = 0.34;
-    public static final double FLYWHEEL_1_KS = 12;
+    public static final double FLYWHEEL_1_KV = 0.45;
+    public static final double FLYWHEEL_1_KS = 24;
 
     // Shooter 2 (default same as shooter 1; tune independently)
     public static final double FLYWHEEL_2_KP = 15;
