@@ -19,10 +19,11 @@ public class Intake extends SubsystemBase {
     SHOT_LINKED_STOW,
     UP_DEBUG,
     /** 间歇性收放，用来把球往后拨 */
-    FLICK_BACK
+    FLICK_BACK,
+    INITIAL
   }
 
-  private WantedState wantedState = WantedState.UP_STOW_STOP;
+  private WantedState wantedState = WantedState.INITIAL;
 
   private double rollerVoltsSetpoint = 0.0;
   private double deployPosRotSetpoint = 0.0;
@@ -120,6 +121,11 @@ public class Intake extends SubsystemBase {
                 ? Constants.IntakeConstants.FLIP_POS_UP
                 : Constants.IntakeConstants.DEPLOY_POS_UP_ROT;
         rollerVoltsSetpoint = Constants.IntakeConstants.FLICK_ROLLER_VOLTS;
+      }
+      case INITIAL -> {
+        double baseUp = Constants.IntakeConstants.DEPLOY_POS_UP_ROT;
+        deployPosRotSetpoint = baseUp;
+        rollerVoltsSetpoint = -2;
       }
     }
 
